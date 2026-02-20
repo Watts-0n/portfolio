@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import SplashCursor from "@/components/ui/SplashCursor";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -47,6 +48,7 @@ export default function RootLayout({
       <body
         className={`font-body antialiased ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
+        <SplashCursor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}
         </ThemeProvider>

@@ -6,12 +6,7 @@ const nextConfig: NextConfig = {
     experimental:
     {
       turbopackFileSystemCacheForDev: true,
-    },
-    output: 'export',
-    basePath: '/portfolio',
-    images: {
-        unoptimized: true,
-    },
+    }
 };
 
 export default nextConfig;

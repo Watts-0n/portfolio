@@ -25,6 +25,8 @@ import { Container } from "@/components/zippystarter/container";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ProjectImage } from "@/components/project-image";
+import StatusPanel from "@/components/ui/statusPanel";
+import DecryptedText from "@/components/ui/decryptText";
 
 export default function Home() {
   const projects = [
@@ -105,7 +107,7 @@ export default function Home() {
         className="mx-auto max-w-7xl flex items-center justify-between h-16 uppercase"
       >
         <div className="text-xl font-bold font-mono tracking-tighter">
-          Marcus<span className="text-primary">_</span>Chen
+          Dāvids<span className="text-primary">_</span>Locāns
         </div>
         <nav className="hidden md:flex gap-8 text-sm font-medium text-muted-foreground ">
           <Link
@@ -137,7 +139,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <Container
-        wrapperClassName="relative min-h-screen flex items-center pt-16 overflow-hidden"
+        wrapperClassName="relative select-none min-h-screen flex items-center pt-16 overflow-hidden"
         className="mx-auto max-w-7xl flex-1"
       >
         {/* Background Image with Overlay */}
@@ -150,22 +152,33 @@ export default function Home() {
 
         <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono">
+            <div className="inline-flex backdrop-blur-xs items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
               SYSTEM ONLINE // AVAILABLE FOR HIRE
             </div>
+            <DecryptedText
+                revealDirection="start"
+                sequential
+                useOriginalCharsOnly={false}
+                speed={100}
+                animateOn="view"
+                staggerDelay={250}
+                loop={5000}
+                elementByElement={true}
+            >
             <h1 className="text-6xl md:text-8xl font-display tracking-tighter leading-[0.9]">
               FULL
               <br />
-              STACK
+              Stack
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-foreground">
-                DEV_
+                Dev_
               </span>
             </h1>
+            </DecryptedText>
             <p className="md:text-xl text-muted-foreground max-w-md leading-relaxed">
               Architecting digital voids and crafting high-performance web
               experiences. Specialized in scalable distributed systems and
@@ -208,41 +221,7 @@ export default function Home() {
           </div>
 
           {/* Decorative Abstract Element */}
-          <div className="hidden md:block relative h-[500px] w-full border border-border/30 bg-card/10 backdrop-blur-sm p-8">
-            <div className="absolute top-0 left-0 size-4 border-t-2 border-l-2 border-primary"></div>
-            <div className="absolute top-0 right-0 size-4 border-t-2 border-r-2 border-primary"></div>
-            <div className="absolute bottom-0 left-0 size-4 border-b-2 border-l-2 border-primary"></div>
-            <div className="absolute bottom-0 right-0 size-4 border-b-2 border-r-2 border-primary"></div>
-
-            <div className="h-full w-full flex flex-col justify-between font-mono text-xs text-muted-foreground">
-              <div className="flex justify-between">
-                <span>SYS.STATUS: NORMAL</span>
-                <span>UPTIME: 99.9%</span>
-              </div>
-              <div className="space-y-2">
-                <div className="h-1 w-full bg-secondary overflow-hidden">
-                  <div className="h-full bg-primary w-[75%]"></div>
-                </div>
-                <div className="flex justify-between">
-                  <span>CPU_LOAD</span>
-                  <span>75%</span>
-                </div>
-                <div className="h-1 w-full bg-secondary overflow-hidden">
-                  <div className="h-full bg-primary w-[42%]"></div>
-                </div>
-                <div className="flex justify-between">
-                  <span>MEM_USAGE</span>
-                  <span>42%</span>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className="block text-4xl font-bold text-foreground">
-                  03
-                </span>
-                <span>ACTIVE_PROJECTS</span>
-              </div>
-            </div>
-          </div>
+            <StatusPanel />
         </div>
       </Container>
       {/* Projects Section */}
@@ -463,7 +442,7 @@ export default function Home() {
       >
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-xs font-mono text-muted-foreground">
-            © 2025 MARCUS CHEN. ALL RIGHTS RESERVED.
+            © 2025 Dāvids Locāns. ALL RIGHTS RESERVED.
           </div>
           <div className="flex gap-6 text-xs font-mono text-muted-foreground">
             <Link href="#" className="hover:text-primary transition-colors">

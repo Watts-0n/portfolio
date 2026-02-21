@@ -5,6 +5,7 @@ import "./globals.css";
 import SplashCursor from "@/components/ui/SplashCursor";
 import PixelBlast from "@/components/ui/background";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -76,6 +77,7 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

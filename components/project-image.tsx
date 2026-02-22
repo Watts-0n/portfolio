@@ -24,7 +24,7 @@ export function ProjectImage({ src, alt }: ProjectImageProps) {
         alt={alt}
         fill
         onLoad={() => setLoaded(true)}
-        className="object-cover group-hover:scale-105 transition-transform duration-500 grayscale mix-blend-luminosity dark:mix-blend-darken"
+        className="object-cover group-hover:scale-105 group-hover:grayscale-0 group-hover:mix-blend-normal transition-transform duration-500 grayscale mix-blend-luminosity dark:mix-blend-darken"
       />
       <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     </div>

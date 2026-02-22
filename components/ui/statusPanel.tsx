@@ -55,7 +55,7 @@ export default function StatusPanel() {
                 <div className="w-full flex flex-row-reverse justify-between gap-x-2">
                     {/* Image */}
                     <div className="w-[50%] relative rounded-2xl overflow-hidden ">
-                        <Image src="/David.png" alt="David" width={864} height={1184} />
+                        <Image src="/David2.png" alt="David" width={864} height={1184} />
                     </div>
 
                     {/* Metrics */}

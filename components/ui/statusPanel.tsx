@@ -10,10 +10,13 @@ const METRICS = [
     { key: "MEMORY", base: 75, variance: 5 },
 ];
 
-export default function StatusPanel() {
+interface StatusPanelProps {
+    projects: number;
+}
+
+export default function StatusPanel({ projects }:StatusPanelProps) {
     const [values, setValues] = useState(METRICS.map((m) => m.base));
     const [uptime, setUptime] = useState(99.9);
-    const [projects, setProjects] = useState(3);
     const [tick, setTick] = useState(0);
 
     useEffect(() => {
@@ -88,7 +91,7 @@ export default function StatusPanel() {
           <span className="block text-4xl font-bold text-foreground tabular-nums transition-all duration-500">
             {String(projects).padStart(2, "0")}
           </span>
-                    <span>ACTIVE_PROJECTS</span>
+                    <span>PROJECTS</span>
                 </div>
             </div>
         </div>

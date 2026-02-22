@@ -57,6 +57,24 @@ export default function Home() {
       link: "#",
       repo: "#",
     },
+    {
+      title: "Cyber Construct",
+      description:
+          "3D architectural visualization tool running in the browser using WebGL.",
+      tags: ["Three.js", "WebGL", "Vue", "Python"],
+      image: "/project-placeholder-3.jpg",
+      link: "#",
+      repo: "#",
+    },
+    {
+      title: "Cyber Construct",
+      description:
+          "3D architectural visualization tool running in the browser using WebGL.",
+      tags: ["Three.js", "WebGL", "Vue", "Python"],
+      image: "/project-placeholder-3.jpg",
+      link: "#",
+      repo: "#",
+    },
   ];
 
   const skills = [
@@ -221,7 +239,7 @@ export default function Home() {
           </div>
 
           {/* Decorative Abstract Element */}
-            <StatusPanel />
+            <StatusPanel projects={projects.length} />
         </div>
       </Container>
       {/* Projects Section */}
@@ -229,7 +247,7 @@ export default function Home() {
         id="projects"
         component="section"
         wrapperClassName="py-24 border-t border-border"
-        className="mx-auto max-w-7xl flex-1"
+        className="mx-auto max-w-7xl flex-1 relative z-10"
       >
         <div className="grid justify-between items-end mb-16 gap-4">
           <div>
@@ -238,7 +256,7 @@ export default function Home() {
               <br />
               WORKS
             </h2>
-            <div className="h-1 w-24 bg-primary"></div>
+            <div className="h-1 w-24 bg-primary z-2"></div>
           </div>
           <p className="text-muted-foreground max-w-sm text-left">
             A collection of experiments, production apps, and open source
@@ -299,7 +317,7 @@ export default function Home() {
         id="skills"
         component="section"
         wrapperClassName="py-24 bg-secondary/20 border-t border-border"
-        className="mx-auto max-w-7xl flex-1"
+        className="mx-auto max-w-7xl flex-1 relative z-10"
       >
         <div className="grid md:grid-cols-12 gap-12">
           <div className="md:col-span-4">
@@ -357,7 +375,7 @@ export default function Home() {
       {/* Blog Section */}
       <Container
         id="blog"
-        className="py-24 border-t border-border max-w-7xl mx-auto"
+        className="py-24 border-t border-border max-w-7xl mx-auto relative z-10"
       >
         <h2 className="text-4xl font-display mb-12 uppercase">Transmissions</h2>
 
@@ -386,7 +404,7 @@ export default function Home() {
       </Container>
       {/* Contact Section */}
       <Container id="contact" className="py-24 bg-card border-t border-border">
-        <div className="max-w-2xl justify-self-center">
+        <div className="max-w-2xl justify-self-center relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-display mb-4">INITIATE_CONTACT</h2>
             <p className="text-muted-foreground">
@@ -440,7 +458,7 @@ export default function Home() {
         component="footer"
         className="py-8 border-t border-border bg-background text-center max-w-7xl mx-auto"
       >
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
           <div className="text-xs font-mono text-muted-foreground">
             © 2025 Dāvids Locāns. ALL RIGHTS RESERVED.
           </div>

@@ -6,7 +6,7 @@
 @theme inline {
   --font-sans: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --font-display-family: var(--font-inter-tight);
+  --font-display-family: var(--font-mono);
   --font-display-weight: 700;
   --font-display-tracking: var(--tracking-tighter);
   --font-body-family: var(--font-sans);
@@ -126,9 +126,9 @@
   --sidebar-ring: oklch(0.88 0.2 120);
 }
 
-@media (width >= theme("screens.lg")) {
+@media (min-width: 1024px) {
   :root {
-    --m: --spacing(8);
+    --m: 2rem; /* spacing-8 = 2rem */
   }
 }
 

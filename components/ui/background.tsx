@@ -352,29 +352,29 @@ void main(){
 const MAX_CLICKS = 10;
 
 const PixelBlast: React.FC<PixelBlastProps> = ({
-                                                   variant = 'square',
-                                                   pixelSize = 3,
-                                                   color = '#B19EEF',
-                                                   className,
-                                                   style,
-                                                   antialias = true,
-                                                   patternScale = 2,
-                                                   patternDensity = 1,
-                                                   liquid = false,
-                                                   liquidStrength = 0.1,
-                                                   liquidRadius = 1,
-                                                   pixelSizeJitter = 0,
-                                                   enableRipples = true,
-                                                   rippleIntensityScale = 1,
-                                                   rippleThickness = 0.1,
-                                                   rippleSpeed = 0.3,
-                                                   liquidWobbleSpeed = 4.5,
-                                                   autoPauseOffscreen = true,
-                                                   speed = 0.5,
-                                                   transparent = true,
-                                                   edgeFade = 0.5,
-                                                   noiseAmount = 0
-                                               }) => {
+    variant = 'square',
+    pixelSize = 3,
+    color = '#B19EEF',
+    className,
+    style,
+    antialias = true,
+    patternScale = 2,
+    patternDensity = 1,
+    liquid = false,
+    liquidStrength = 0.1,
+    liquidRadius = 1,
+    pixelSizeJitter = 0,
+    enableRipples = true,
+    rippleIntensityScale = 1,
+    rippleThickness = 0.1,
+    rippleSpeed = 0.3,
+    liquidWobbleSpeed = 4.5,
+    autoPauseOffscreen = true,
+    speed = 0.5,
+    transparent = true,
+    edgeFade = 0.5,
+    noiseAmount = 0
+}) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const visibilityRef = useRef({ visible: true });
     const speedRef = useRef(speed);
@@ -440,12 +440,25 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 threeRef.current = null;
             }
             const canvas = document.createElement('canvas');
-            const renderer = new THREE.WebGLRenderer({
-                canvas,
-                antialias,
-                alpha: true,
-                powerPreference: 'high-performance'
-            });
+            // Check WebGL availability before attempting to create the renderer.
+            // WebGL may be sandboxed, disabled, or unavailable (e.g., headless browsers).
+            const testCtx = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+            if (!testCtx) {
+                console.warn('PixelBlast: WebGL is not available in this environment. Skipping background animation.');
+                return;
+            }
+            let renderer: THREE.WebGLRenderer;
+            try {
+                renderer = new THREE.WebGLRenderer({
+                    canvas,
+                    antialias,
+                    alpha: true,
+                    powerPreference: 'high-performance'
+                });
+            } catch (e) {
+                console.warn('PixelBlast: Failed to create WebGL renderer.', e);
+                return;
+            }
             renderer.domElement.style.width = '100%';
             renderer.domElement.style.height = '100%';
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

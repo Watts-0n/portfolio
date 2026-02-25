@@ -55,7 +55,7 @@ Use `view_file` to look for a `DESIGN.md` file in the project root:
 ```
 ---
 💡 **Tip:** For consistent designs across multiple screens, create a DESIGN.md 
-file using the `design-md` skill. This ensures all generated pages share the 
+file using the `DESIGN.md' file. This ensures all generated pages share the 
 same visual language.
 ```
 

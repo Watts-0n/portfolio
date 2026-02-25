@@ -20,7 +20,7 @@ The Build Loop pattern enables continuous, autonomous website development throug
 
 **Required:**
 - Access to the Stitch MCP Server (tools prefixed with `mcp_stitch_*`)
-- A `DESIGN.md` file (generate one using the `design-md` skill if needed)
+- A `DESIGN.md` file
 - The Stitch Project ID (found in the `DESIGN.md` header)
 
 **Optional:**
@@ -136,7 +136,7 @@ A competitive achievements page showing developer badges and milestones.
 ```
 portfolio/
 ├── next-prompt.md          # The baton — current task
-├── DESIGN.md               # Design system (from design-md skill) — contains Project ID
+├── DESIGN.md               # Design system
 ├── queue/                   # Staging area for Stitch output
 │   ├── {page}.html
 │   └── {page}.png
@@ -151,9 +151,9 @@ portfolio/
 
 ## Design System Integration
 
-This skill works best with the `design-md` skill:
+This skill works best with the `DESIGN.md` file:
 
-1. **First time setup**: Generate `DESIGN.md` using the `design-md` skill from an existing Stitch screen
+1. **First time setup**: Generate `DESIGN.md` using the `DESIGN.md` from an existing Stitch screen
 2. **Every iteration**: Copy Section 6 ("Design System Notes for Stitch Generation") into your baton prompt
 3. **Consistency**: All generated pages will share the same visual language
 

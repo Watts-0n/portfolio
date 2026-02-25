@@ -1,11 +1,6 @@
 ---
 name: design-md
 description: Analyze Stitch projects and synthesize a semantic design system into DESIGN.md files
-allowed-tools:
-  - "stitch*:*"
-  - "Read"
-  - "Write"
-  - "web_fetch"
 ---
 
 # Stitch DESIGN.md Skill
@@ -18,7 +13,7 @@ This skill helps you create `DESIGN.md` files that serve as the "source of truth
 
 ## Prerequisites
 
-- Access to the Stitch MCP Server
+- Access to the Stitch MCP Server (tools prefixed with `mcp_stitch_*`)
 - A Stitch project with at least one designed screen
 - Access to the Stitch Effective Prompting Guide: https://stitch.withgoogle.com/docs/learn/prompting/
 
@@ -28,35 +23,34 @@ The `DESIGN.md` file will serve as the "source of truth" for prompting Stitch to
 
 ## Retrieval and Networking
 
-To analyze a Stitch project, you must retrieve screen metadata and design assets using the Stitch MCP Server tools:
+To analyze a Stitch project, retrieve screen metadata and design assets using the Stitch MCP tools:
 
-1. **Namespace discovery**: Run `list_tools` to find the Stitch MCP prefix. Use this prefix (e.g., `mcp_stitch:`) for all subsequent calls.
+1. **Project lookup** (if Project ID is not known):
+   - Check `DESIGN.md` for a previously stored Project ID in the header
+   - If not found, call `mcp_stitch_list_projects` with `filter: "view=owned"` to retrieve all user projects
+   - Identify the target project by title
+   - Extract the Project ID from the `name` field (e.g., `projects/14179918346701536450` → ID is `14179918346701536450`)
 
-2. **Project lookup** (if Project ID is not provided):
-   - Call `[prefix]:list_projects` with `filter: "view=owned"` to retrieve all user projects
-   - Identify the target project by title or URL pattern
-   - Extract the Project ID from the `name` field (e.g., `projects/13534454087919359824`)
-
-3. **Screen lookup** (if Screen ID is not provided):
-   - Call `[prefix]:list_screens` with the `projectId` (just the numeric ID, not the full path)
-   - Review screen titles to identify the target screen (e.g., "Home", "Landing Page")
+2. **Screen lookup**:
+   - Call `mcp_stitch_list_screens` with the `projectId` (just the numeric ID, not the full path)
+   - Auto-select the first/main screen — do not ask the user which screen to use
    - Extract the Screen ID from the screen's `name` field
 
-4. **Metadata fetch**: 
-   - Call `[prefix]:get_screen` with both `projectId` and `screenId` (both as numeric IDs only)
+3. **Metadata fetch**: 
+   - Call `mcp_stitch_get_screen` with `projectId`, `screenId`, and full `name` path
    - This returns the complete screen object including:
      - `screenshot.downloadUrl` - Visual reference of the design
      - `htmlCode.downloadUrl` - Full HTML/CSS source code
      - `width`, `height`, `deviceType` - Screen dimensions and target platform
      - Project metadata including `designTheme` with color and style information
 
-5. **Asset download**:
-   - Use `web_fetch` or `read_url_content` to download the HTML code from `htmlCode.downloadUrl`
+4. **Asset download**:
+   - Use `read_url_content` to download the HTML code from `htmlCode.downloadUrl`
    - Optionally download the screenshot from `screenshot.downloadUrl` for visual reference
    - Parse the HTML to extract Tailwind classes, custom CSS, and component patterns
 
-6. **Project metadata extraction**:
-   - Call `[prefix]:get_project` with the project `name` (full path: `projects/{id}`) to get:
+5. **Project metadata extraction**:
+   - Call `mcp_stitch_get_project` with the project `name` (full path: `projects/{id}`) to get:
      - `designTheme` object with color mode, fonts, roundness, custom colors
      - Project-level design guidelines and descriptions
      - Device type preferences and layout principles
@@ -114,38 +108,11 @@ Explain how the UI handles layers. Describe the presence and quality of shadows 
 
 ## 5. Layout Principles
 (Description of whitespace strategy, margins, and grid alignment.)
+
+## 6. Design System Notes for Stitch Generation
+> **Copy this entire section into every Stitch prompt to ensure visual consistency.**
+(Condensed version of the above in a copy-paste-ready code block.)
 ```
-
-## Usage Example
-
-To use this skill for the Furniture Collection project:
-
-1. **Retrieve project information:**
-   ```
-   Use the Stitch MCP Server to get the Furniture Collection project
-   ```
-
-2. **Get the Home page screen details:**
-   ```
-   Retrieve the Home page screen's code, image, and screen object information
-   ```
-
-3. **Reference best practices:**
-   ```
-   Review the Stitch Effective Prompting Guide at:
-   https://stitch.withgoogle.com/docs/learn/prompting/
-   ```
-
-4. **Analyze and synthesize:**
-   - Extract all relevant design tokens from the screen
-   - Translate technical values into descriptive language
-   - Organize information according to the DESIGN.md structure
-
-5. **Generate the file:**
-   - Create `DESIGN.md` in the project directory
-   - Follow the prescribed format exactly
-   - Ensure all color codes are accurate
-   - Use evocative, designer-friendly language
 
 ## Best Practices
 
@@ -155,14 +122,6 @@ To use this skill for the Furniture Collection project:
 - **Be Visual:** Help readers visualize the design through your descriptions
 - **Be Precise:** Include exact values (hex codes, pixel values) in parentheses after natural language descriptions
 
-## Tips for Success
-
-1. **Start with the big picture:** Understand the overall aesthetic before diving into details
-2. **Look for patterns:** Identify consistent spacing, sizing, and styling patterns
-3. **Think semantically:** Name colors by their purpose, not just their appearance
-4. **Consider hierarchy:** Document how visual weight and importance are communicated
-5. **Reference the guide:** Use language and patterns from the Stitch Effective Prompting Guide
-
 ## Common Pitfalls to Avoid
 
 - ❌ Using technical jargon without translation (e.g., "rounded-xl" instead of "generously rounded corners")
@@ -170,3 +129,4 @@ To use this skill for the Furniture Collection project:
 - ❌ Forgetting to explain functional roles of design elements
 - ❌ Being too vague in atmosphere descriptions
 - ❌ Ignoring subtle design details like shadows or spacing patterns
+- ❌ Asking the user which screen to analyze — auto-pick the first/main screen

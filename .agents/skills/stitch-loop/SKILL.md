@@ -1,36 +1,30 @@
 ---
 name: stitch-loop
 description: Teaches agents to iteratively build websites using Stitch with an autonomous baton-passing loop pattern
-allowed-tools:
-  - "stitch*:*"
-  - "chrome*:*"
-  - "Read"
-  - "Write"
-  - "Bash"
 ---
 
 # Stitch Build Loop
 
-You are an **autonomous frontend builder** participating in an iterative site-building loop. Your goal is to generate a page using Stitch, integrate it into the site, and prepare instructions for the next iteration.
+You are an **autonomous frontend builder** participating in an iterative site-building loop. Your goal is to generate a page/section using Stitch, convert it to a React component, integrate it into the Next.js site, and prepare instructions for the next iteration.
 
 ## Overview
 
 The Build Loop pattern enables continuous, autonomous website development through a "baton" system. Each iteration:
 1. Reads the current task from a baton file (`next-prompt.md`)
-2. Generates a page using Stitch MCP tools
-3. Integrates the page into the site structure
-4. Writes the next task to the baton file for the next iteration
+2. Enhances the prompt and generates a screen using Stitch MCP tools
+3. Converts the Stitch output to a React component
+4. Integrates the component into `app/page.tsx`
+5. Writes the next task to the baton file for the next iteration
 
 ## Prerequisites
 
 **Required:**
-- Access to the Stitch MCP Server
-- A Stitch project (existing or will be created)
+- Access to the Stitch MCP Server (tools prefixed with `mcp_stitch_*`)
 - A `DESIGN.md` file (generate one using the `design-md` skill if needed)
-- A `SITE.md` file documenting the site vision and roadmap
+- The Stitch Project ID (found in the `DESIGN.md` header)
 
 **Optional:**
-- Chrome DevTools MCP Server — enables visual verification of generated pages
+- A `next-prompt.md` baton file (will be created if it doesn't exist)
 
 ## The Baton System
 
@@ -40,98 +34,87 @@ The `next-prompt.md` file acts as a relay baton between iterations:
 ---
 page: about
 ---
-A page describing how jules.top tracking works.
+A page describing the about section.
 
 **DESIGN SYSTEM (REQUIRED):**
 [Copy from DESIGN.md Section 6]
 
 **Page Structure:**
 1. Header with navigation
-2. Explanation of tracking methodology
+2. About content with bio
 3. Footer with links
 ```
 
 **Critical rules:**
-- The `page` field in YAML frontmatter determines the output filename
-- The prompt content must include the design system block from `DESIGN.md`
+- The `page` field in YAML frontmatter determines the component name
+- The prompt content must include the design system block from `DESIGN.md` Section 6
 - You MUST update this file before completing your work to continue the loop
 
 ## Execution Protocol
 
 ### Step 1: Read the Baton
 
-Parse `next-prompt.md` to extract:
-- **Page name** from the `page` frontmatter field
+Use `view_file` to parse `next-prompt.md` and extract:
+- **Page/section name** from the `page` frontmatter field
 - **Prompt content** from the markdown body
+
+If `next-prompt.md` doesn't exist, ask the user what to build and create it.
 
 ### Step 2: Consult Context Files
 
-Before generating, read these files:
+Before generating, use `view_file` to read:
 
 | File | Purpose |
 |------|---------|
-| `SITE.md` | Site vision, **Stitch Project ID**, existing pages (sitemap), roadmap |
-| `DESIGN.md` | Required visual style for Stitch prompts |
+| `DESIGN.md` | Design system — Section 6 MUST be injected into every Stitch prompt |
 
-**Important checks:**
-- Section 4 (Sitemap) — Do NOT recreate pages that already exist
-- Section 5 (Roadmap) — Pick tasks from here if backlog exists
-- Section 6 (Creative Freedom) — Ideas for new pages if roadmap is empty
+**Important:** Check the Stitch Project ID from the `DESIGN.md` header. Use this ID for all `mcp_stitch_*` calls.
 
 ### Step 3: Generate with Stitch
 
 Use the Stitch MCP tools to generate the page:
 
-1. **Discover namespace**: Run `list_tools` to find the Stitch MCP prefix
-2. **Get or create project**: 
-   - If `stitch.json` exists, use the `projectId` from it
-   - Otherwise, call `[prefix]:create_project` and save the ID to `stitch.json`
-3. **Generate screen**: Call `[prefix]:generate_screen_from_text` with:
-   - `projectId`: The project ID
-   - `prompt`: The full prompt from the baton (including design system block)
+1. **Get or verify project**: 
+   - Use the Project ID from `DESIGN.md` header
+   - If no project exists, call `mcp_stitch_create_project` and update `DESIGN.md` with the new ID
+2. **Generate screen**: Call `mcp_stitch_generate_screen_from_text` with:
+   - `projectId`: The project ID from `DESIGN.md`
+   - `prompt`: The full prompt from the baton (including design system block from Section 6)
    - `deviceType`: `DESKTOP` (or as specified)
-4. **Retrieve assets**: Call `[prefix]:get_screen` to get:
-   - `htmlCode.downloadUrl` — Download and save as `queue/{page}.html`
-   - `screenshot.downloadUrl` — Download and save as `queue/{page}.png`
+3. **Retrieve assets**: Call `mcp_stitch_get_screen` to get:
+   - `htmlCode.downloadUrl` — Download with `read_url_content` and save to `queue/{page}.html`
+   - `screenshot.downloadUrl` — Download and save to `queue/{page}.png`
 
-### Step 4: Integrate into Site
+### Step 4: Convert to React Component
 
-1. Move generated HTML from `queue/{page}.html` to `site/public/{page}.html`
-2. Fix any asset paths to be relative to the public folder
-3. Update navigation:
-   - Find existing placeholder links (e.g., `href="#"`) and wire them to the new page
-   - Add the new page to the global navigation if appropriate
-4. Ensure consistent headers/footers across all pages
+Follow the `react:components` skill pattern:
 
-### Step 4.5: Visual Verification (Optional)
+1. Use `read_url_content` to fetch the Stitch HTML from `htmlCode.downloadUrl`
+2. Extract the relevant sections from the HTML
+3. Create a new component file at `components/{page-name}.tsx`
+4. Use TypeScript with proper `Props` interfaces
+5. Use `@/` import aliases and follow existing project conventions
+6. Map Tailwind classes from the Stitch output to the component
 
-If the **Chrome DevTools MCP Server** is available, verify the generated page:
+### Step 5: Integrate into Site
 
-1. **Check availability**: Run `list_tools` to see if `chrome*` tools are present
-2. **Start dev server**: Use Bash to start a local server (e.g., `npx serve site/public`)
-3. **Navigate to page**: Call `[chrome_prefix]:navigate` to open `http://localhost:3000/{page}.html`
-4. **Capture screenshot**: Call `[chrome_prefix]:screenshot` to capture the rendered page
-5. **Visual comparison**: Compare against the Stitch screenshot (`queue/{page}.png`) for fidelity
-6. **Stop server**: Terminate the dev server process
+1. Use `view_file` to read `app/page.tsx`
+2. Import the new component at the top of the file
+3. Add the component in the correct position within the page layout
+4. Ensure consistent spacing and section structure
 
-> **Note:** This step is optional. If Chrome DevTools MCP is not installed, skip to Step 5.
+### Step 6: Verify
 
-### Step 5: Update Site Documentation
+1. Run `run_command` with `npx tsc --noEmit` to type-check
+2. Run `run_command` with `npm run build` to verify the build
+3. Optionally run `run_command` with `npm run dev` to preview
 
-Modify `SITE.md`:
-- Add the new page to Section 4 (Sitemap) with `[x]`
-- Remove any idea you consumed from Section 6 (Creative Freedom)
-- Update Section 5 (Roadmap) if you completed a backlog item
-
-### Step 6: Prepare the Next Baton (Critical)
+### Step 7: Prepare the Next Baton (Critical)
 
 **You MUST update `next-prompt.md` before completing.** This keeps the loop alive.
 
-1. **Decide the next page**: 
-   - Check `SITE.md` Section 5 (Roadmap) for pending items
-   - If empty, pick from Section 6 (Creative Freedom)
-   - Or invent something new that fits the site vision
-2. **Write the baton** with proper YAML frontmatter:
+1. **Decide the next section/page**: Pick the next logical section or ask the user
+2. **Write the baton** with proper YAML frontmatter and include `DESIGN.md` Section 6
 
 ```markdown
 ---
@@ -140,7 +123,7 @@ page: achievements
 A competitive achievements page showing developer badges and milestones.
 
 **DESIGN SYSTEM (REQUIRED):**
-[Copy the entire design system block from DESIGN.md]
+[Copy the entire design system block from DESIGN.md Section 6]
 
 **Page Structure:**
 1. Header with title and navigation
@@ -151,31 +134,20 @@ A competitive achievements page showing developer badges and milestones.
 ## File Structure Reference
 
 ```
-project/
-├── next-prompt.md      # The baton — current task
-├── stitch.json         # Stitch project ID (persist this!)
-├── DESIGN.md           # Visual design system (from design-md skill)
-├── SITE.md             # Site vision, sitemap, roadmap
-├── queue/              # Staging area for Stitch output
+portfolio/
+├── next-prompt.md          # The baton — current task
+├── DESIGN.md               # Design system (from design-md skill) — contains Project ID
+├── queue/                   # Staging area for Stitch output
 │   ├── {page}.html
 │   └── {page}.png
-└── site/public/        # Production pages
-    ├── index.html
-    └── {page}.html
+├── app/
+│   ├── page.tsx             # Main page — sections composed here
+│   ├── layout.tsx           # Root layout
+│   └── globals.css          # Global styles
+└── components/
+    ├── ui/                  # shadcn/ui components (don't edit)
+    └── {section-name}.tsx   # Generated section components
 ```
-
-## Orchestration Options
-
-The loop can be driven by different orchestration layers:
-
-| Method | How it works |
-|--------|--------------|
-| **CI/CD** | GitHub Actions triggers on `next-prompt.md` changes |
-| **Human-in-loop** | Developer reviews each iteration before continuing |
-| **Agent chains** | One agent dispatches to another (e.g., Jules API) |
-| **Manual** | Developer runs the agent repeatedly with the same repo |
-
-The skill is orchestration-agnostic — focus on the pattern, not the trigger mechanism.
 
 ## Design System Integration
 
@@ -188,16 +160,17 @@ This skill works best with the `design-md` skill:
 ## Common Pitfalls
 
 - ❌ Forgetting to update `next-prompt.md` (breaks the loop)
-- ❌ Recreating a page that already exists in the sitemap
-- ❌ Not including the design system block in the prompt
-- ❌ Leaving placeholder links (`href="#"`) instead of wiring real navigation
-- ❌ Forgetting to persist `stitch.json` after creating a new project
+- ❌ Not including the design system block (Section 6) in the prompt
+- ❌ Using wrong tool names (always use `mcp_stitch_*`, `view_file`, `write_to_file`, `run_command`)
+- ❌ Placing components in `src/` instead of `components/`
+- ❌ Creating a new Stitch project when one already exists (check `DESIGN.md` for Project ID)
 
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
-| Stitch generation fails | Check that the prompt includes the design system block |
-| Inconsistent styles | Ensure DESIGN.md is up-to-date and copied correctly |
+| Stitch generation fails | Verify the prompt includes the DESIGN.md Section 6 block |
+| Inconsistent styles | Re-read DESIGN.md and ensure full Section 6 is copied |
 | Loop stalls | Verify `next-prompt.md` was updated with valid frontmatter |
-| Navigation broken | Check all internal links use correct relative paths |
+| Component doesn't render | Check imports in `app/page.tsx` and verify `"use client"` directive if needed |
+| Build fails | Run `npx tsc --noEmit` to find type errors |

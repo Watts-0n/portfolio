@@ -25,9 +25,9 @@ stitch-project-id: 13534454087919359824
     * **Accents:** Deep muted teal-navy (#294056) for CTAs and highlights.
     * **Text:** Charcoal near-black (#2C2C2C) for headlines, soft gray (#6B6B6B) for body.
 
-## 3. Architecture & File Structure
-* **Root:** `site/public/`
-* **Asset Flow:** Stitch generates to `queue/` -> Validate -> Move to `site/public/`.
+## 3. Architecture & File Structure (Static HTML Example)
+* **Root:** `site/public/` (adapt for your framework, e.g. `app/` + `components/` for Next.js)
+* **Asset Flow:** Stitch generates to `queue/` -> Validate -> Integrate into project.
 * **Navigation Strategy:**
     * **Global Header:** Logo, Shop, Collections, About, Contact.
     * **Global Footer:** Sustainability, Craftsmanship, Shipping Info, Social Links.

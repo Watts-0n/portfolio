@@ -1,9 +1,6 @@
 ---
 name: enhance-prompt
 description: Transforms vague UI ideas into polished, Stitch-optimized prompts. Enhances specificity, adds UI/UX keywords, injects design system context, and structures output for better generation results.
-allowed-tools:
-  - "Read"
-  - "Write"
 ---
 
 # Enhance Prompt for Stitch
@@ -45,10 +42,10 @@ Evaluate what's missing from the user's prompt:
 
 ### Step 2: Check for DESIGN.md
 
-Look for a `DESIGN.md` file in the current project:
+Use `view_file` to look for a `DESIGN.md` file in the project root:
 
 **If DESIGN.md exists:**
-1. Read the file to extract the design system block
+1. Read the file to extract Section 6 (Design System Notes for Stitch Generation)
 2. Include the color palette, typography, and component styles
 3. Format as a "DESIGN SYSTEM (REQUIRED)" section in the output
 
@@ -136,11 +133,9 @@ Structure the enhanced prompt in this order:
 
 ## Output Options
 
-**Default:** Return the enhanced prompt as text for the user to copy.
+**Default:** Return the enhanced prompt as text, then immediately send it to Stitch via `mcp_stitch_generate_screen_from_text`.
 
-**Optional file output:** If the user requests, write to a file:
-- `next-prompt.md` — for use with the `stitch-loop` skill
-- Custom filename specified by user
+**Optional file output:** If part of the stitch-loop workflow, write to `next-prompt.md`.
 
 ## Examples
 
@@ -169,10 +164,6 @@ A clean, trustworthy login page with a centered form and subtle branding.
 2. **Login Card:** Centered form with email, password fields, "Forgot password?" link
 3. **Submit Button:** Primary blue "Sign In" button
 4. **Footer:** "Don't have an account? Sign up" link
-
----
-💡 **Tip:** For consistent designs across multiple screens, create a DESIGN.md 
-file using the `design-md` skill.
 ```
 
 ### Example 2: Feature Request → Targeted Edit

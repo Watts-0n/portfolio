@@ -25,8 +25,8 @@ Use these templates when setting up a new project for the build loop.
     * *Tertiary:* [Additional flavor]
 
 ## 3. Architecture & File Structure
-* **Root:** `site/public/`
-* **Asset Flow:** Stitch generates to `queue/` → Validate → Move to `site/public/`
+* **Root:** [Your project root, e.g. `app/` for Next.js or `site/public/` for static]
+* **Asset Flow:** Stitch generates to `queue/` → Convert to component → Integrate into project
 * **Navigation Strategy:** [How nav works]
 
 ## 4. Live Sitemap (Current State)

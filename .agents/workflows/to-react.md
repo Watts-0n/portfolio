@@ -1,16 +1,18 @@
 ---
-description: Convert a Stitch screen into clean, modular React/Vite components using the react:components skill
+description: Convert a Stitch screen into clean, modular React/Next.js components using the react:components skill
 ---
 
+// turbo-all
+
 1. Read the skill file at `.agents/skills/react-components/SKILL.md`
-2. Identify the target Stitch screen — ask the user which screen/page to convert if not specified
-3. Call `mcp_stitch_get_screen` to retrieve the screen's HTML code and screenshot
-4. Download the HTML from `htmlCode.downloadUrl` using the fetch script or curl
-5. Extract the Tailwind config from the HTML `<head>` and sync with `resources/style-guide.json`
-6. Create `src/data/mockData.ts` with all static content extracted from the design
-7. Create modular component files in `src/components/` using the component template
-8. Move event handlers and logic into custom hooks in `src/hooks/`
-9. Update `App.tsx` to render the new components
-10. Run `npm run validate` for each component to check for TypeScript errors
-11. Run `npm run dev` to verify the live result
+2. Read `DESIGN.md` to get the Stitch Project ID and design system context
+3. Identify the target Stitch screen — if not specified, call `mcp_stitch_list_screens` and pick the most recent
+4. Call `mcp_stitch_get_screen` to retrieve the screen's HTML code and screenshot
+5. Download the HTML from `htmlCode.downloadUrl` using `read_url_content`
+6. Extract the Tailwind config from the HTML `<head>` and map to project's `globals.css` variables
+7. Create modular component files in `components/` with TypeScript interfaces
+8. Move static data into constants at the top of component files
+9. Update `app/page.tsx` to import and render the new components
+10. Run `npx tsc --noEmit` to verify types
+11. Run `npm run build` to verify the full build
 12. Report which files were created and any issues found

@@ -51,3 +51,6 @@ dist
 # Focus app generated files
 apps/focus/dist/
 apps/focus/temp_*/
+
+.gemini/
+gha-creds-*.json

@@ -74,12 +74,12 @@ const DEFAULTS = {
   SIM_RESOLUTION: 128,
   DYE_RESOLUTION: 1024,
   CAPTURE_RESOLUTION: 512,
-  DENSITY_DISSIPATION: 3.5,
+  DENSITY_DISSIPATION: 5,
   VELOCITY_DISSIPATION: 2,
-  PRESSURE: 0.1,
+  PRESSURE: 0.2,
   PRESSURE_ITERATIONS: 15,
   CURL: 3,
-  SPLAT_RADIUS: 0.2,
+  SPLAT_RADIUS: 0.1,
   SPLAT_FORCE: 6000,
   SHADING: true,
   COLOR_UPDATE_SPEED: 10,
@@ -105,8 +105,16 @@ function HSVtoRGB(h: number, s: number, v: number): ColorRGB {
 }
 
 function generateColor(): ColorRGB {
-  const c = HSVtoRGB(Math.random(), 1.0, 1.0);
-  return { r: c.r * 0.15, g: c.g * 0.15, b: c.b * 0.15 };
+  let h = Math.random();
+  // Avoid the "dirty" yellow/brown hue range (roughly 0.08 - 0.18)
+  if (h > 0.08 && h < 0.18) h += 0.15;
+  if (h > 1.0) h -= 1.0;
+
+  // Clean pastels: keep Value high (brightness) and Saturation moderate.
+  // This prevents colors from looking like "mud" or "dirt".
+  const s = 0.3 + Math.random() * 0.3; // 0.4 to 0.7
+  const v = 1.0; // Keep it fully bright
+  return HSVtoRGB(h, s, v);
 }
 
 function wrap(value: number, min: number, max: number): number {
@@ -461,19 +469,30 @@ export default function SplashCursor(props: SplashCursorProps) {
       precision highp float; precision highp sampler2D;
       varying vec2 vUv; varying vec2 vL; varying vec2 vR; varying vec2 vT; varying vec2 vB;
       uniform sampler2D uTexture; uniform vec2 texelSize;
-      vec3 linearToGamma(vec3 c){c=max(c,vec3(0));return max(1.055*pow(c,vec3(0.416666667))-0.055,vec3(0));}
+
       void main(){
-        vec3 c=texture2D(uTexture,vUv).rgb;
+        vec3 c = texture2D(uTexture, vUv).rgb;
         #ifdef SHADING
-          vec3 lc=texture2D(uTexture,vL).rgb, rc=texture2D(uTexture,vR).rgb;
-          vec3 tc=texture2D(uTexture,vT).rgb, bc=texture2D(uTexture,vB).rgb;
-          float dx=length(rc)-length(lc); float dy=length(tc)-length(bc);
-          vec3 n=normalize(vec3(dx,dy,length(texelSize)));
-          float diffuse=clamp(dot(n,vec3(0,0,1))+0.7,0.7,1.0);
-          c*=diffuse;
+          vec3 lc = texture2D(uTexture, vL).rgb, rc = texture2D(uTexture, vR).rgb;
+          vec3 tc = texture2D(uTexture, vT).rgb, bc = texture2D(uTexture, vB).rgb;
+          float dx = length(rc) - length(lc); float dy = length(tc) - length(bc);
+          vec3 n = normalize(vec3(dx, dy, length(texelSize)));
+          // Softened diffuse to prevent dark "grit" at the edges
+          float diffuse = clamp(dot(n, vec3(0, 0, 1)) + 1.0, 1.0, 1.0);
+          c *= diffuse;
         #endif
-        float a=max(c.r,max(c.g,c.b));
-        gl_FragColor=vec4(c,a);
+
+        // Tonemapping: prevent the additive fluid from ever reaching true white.
+        // This keeps the "dark" feel even when many splats overlap.
+        // We use a simple Reinhard curve to map [0, inf] -> [0, 1]
+        c = c / (0.85 + c);
+
+        // Alpha calculation based on the tonemapped intensity
+        float a = max(c.r, max(c.g, c.b));
+        // Push alpha non-linearly to keep dark colors solid
+        a = pow(clamp(a, 0.0, 1.0), 0.75);
+
+        gl_FragColor = vec4(c, a);
       }
     `;
 
@@ -692,7 +711,8 @@ export default function SplashCursor(props: SplashCursorProps) {
 
     const clickSplat = () => {
       const color = generateColor();
-      color.r *= 10; color.g *= 10; color.b *= 10;
+      // Reduced boost to prevent blowing out to white
+      color.r *= 2.0; color.g *= 2.0; color.b *= 2.0;
       splat(
         pointer.texcoordX, pointer.texcoordY,
         10 * (Math.random() - 0.5), 30 * (Math.random() - 0.5),

@@ -167,15 +167,31 @@
 }
 
 @utility bg-grid-lines {
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
 @utility bg-cross-grid {
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
+  background-image: linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 48px 48px;
+}
+
+/* Hero background breathing animation */
+@keyframes hero-breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.animate-hero-breathe {
+  animation: hero-breathe 5s ease-in-out infinite;
+  transform-origin: center center;
 }

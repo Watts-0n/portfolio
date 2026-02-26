@@ -38,6 +38,7 @@ import { useState, useEffect, useRef } from "react";
 import LogoLoop from "@/components/ui/LogoLoop";
 import TiltedCard from "@/components/ui/TiltedCard";
 import { GlassPanel } from "@/components/ui/glass-panel";
+import PixelBlast from "@/components/ui/background";
 
 // Animated skill bar component
 function SkillBar({ skill, level, delay = 0 }: { skill: string; level: number; delay?: number }) {
@@ -358,11 +359,26 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground overflow-x-hidden">
+      {/* Scrollable PixelBlast background — covers the entire page height */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+        <PixelBlast
+          variant="triangle"
+          pixelSize={4}
+          color="#c0c0c0"
+          patternScale={50}
+          patternDensity={0.3}
+          pixelSizeJitter={0}
+          enableRipples={false}
+          speed={0.5}
+          edgeFade={0}
+          transparent
+        />
+      </div>
       {/* Navigation / Header */}
       <Container
         component="header"
-        wrapperClassName="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border"
+        wrapperClassName="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-sm"
         className="mx-auto max-w-7xl flex items-center justify-between h-16 uppercase"
       >
         <div className="text-xl font-bold font-mono tracking-tighter">
@@ -388,16 +404,16 @@ export default function Home() {
         className="mx-auto max-w-7xl flex-1"
       >
         {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <div className="relative w-[100vw] h-[100vh] bg-background overflow-hidden">
-            <div className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/hero-bg.jpg')] before:absolute before:inset-0 before:bg-primary before:mix-blend-color-dodge dark:before:mix-blend-color" />
+        <div className="fixed w-screen h-screen inset-0 z-0">
+          <div className="relative w-screen h-screen bg-background overflow-hidden">
+            <div className="animate-hero-breathe absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/hero-bg.jpg')] before:absolute before:inset-0 before:bg-primary before:mix-blend-color-dodge dark:before:mix-blend-color" />
           </div>
           <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/50 to-background" />
         </div>
 
-        <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center pt-8 pt:sm-0">
           <div className="space-y-6">
-            <div className="inline-flex backdrop-blur-xs items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono">
+            <div className="inline-flex backdrop-blur-xs items-center gap-2 py-1 px-3 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -462,7 +478,7 @@ export default function Home() {
       <Container
         id="projects"
         component="section"
-        wrapperClassName="py-24 border-t border-border bg-background bg-dot-grid"
+        wrapperClassName="relative z-10 py-24 border-t border-border backdrop-blur-[3px] shadow-lg"
         className="mx-auto max-w-7xl flex-1"
       >
         {/* Section Header */}
@@ -580,7 +596,7 @@ export default function Home() {
       <Container
         id="skills"
         component="section"
-        wrapperClassName="py-24 border-t border-border bg-secondary/10 bg-cross-grid"
+        wrapperClassName="relative z-10 py-24 border-t border-border bg-secondary/5"
         className="mx-auto max-w-7xl flex-1"
       >
         {/* Section Header */}
@@ -599,9 +615,9 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-12 gap-8">
+        <div className="grid md:grid-cols-12 gap-8 items-center">
           {/* Left — Skill Groups with Bars */}
-          <div className="md:col-span-8 grid sm:grid-cols-3 gap-8">
+          <GlassPanel className="md:col-span-8 grid sm:grid-cols-3 gap-8 p-4 py-15 h-auto sm:h-[300]">
             {skills.map((group, gIdx) => (
               <div key={gIdx} className="space-y-5">
                 {/* Category header */}
@@ -624,7 +640,7 @@ export default function Home() {
                 </div>
               </div>
             ))}
-          </div>
+          </GlassPanel>
 
           {/* Right — Attribute boxes */}
           <div className="md:col-span-4 grid grid-cols-2 gap-3 content-start">
@@ -670,8 +686,8 @@ export default function Home() {
       ═══════════════════════════════════════════ */}
       <Container
         component="section"
-        wrapperClassName="py-12 border-t border-b border-border"
-        className="max-w-7xl mx-auto relative z-10"
+        wrapperClassName="relative z-10 py-12 border-t border-b border-border backdrop-blur-[3px] shadow-lg"
+        className="max-w-7xl mx-auto"
       >
         <LogoLoop
           logos={[
@@ -693,7 +709,7 @@ export default function Home() {
           gap={48}
           logoHeight={20}
           pauseOnHover={true}
-          fadeOut={true}
+          fadeOut={false}
           scaleOnHover={true}
         />
       </Container>
@@ -704,7 +720,7 @@ export default function Home() {
       <Container
         id="blog"
         component="section"
-        wrapperClassName="py-24 border-t border-border bg-dot-grid"
+        wrapperClassName="relative z-10 py-24 border-t border-border"
         className="max-w-7xl mx-auto"
       >
         {/* Header */}
@@ -724,7 +740,7 @@ export default function Home() {
         </div>
 
         {/* Terminal-style post list */}
-        <div className="border border-border">
+        <GlassPanel corners={false} className="border border-border">
           {/* Terminal bar */}
           <div className="border-b border-border bg-card px-4 py-2 flex items-center gap-2">
             <div className="flex gap-1.5">
@@ -770,7 +786,7 @@ export default function Home() {
               </div>
             </Link>
           ))}
-        </div>
+        </GlassPanel>
 
         <div className="text-center mt-8 md:hidden">
           <Button variant="outline" className="font-mono text-xs">VIEW ALL TRANSMISSIONS</Button>
@@ -783,7 +799,7 @@ export default function Home() {
       <Container
         id="contact"
         component="section"
-        wrapperClassName="py-24 border-t border-border bg-card/50 bg-cross-grid"
+        wrapperClassName="relative z-10 py-24 border-t border-border bg-card/20 backdrop-blur-[3px] shadow-lg"
         className="max-w-7xl mx-auto"
       >
         <div className="grid md:grid-cols-2 gap-16 items-start">
@@ -863,7 +879,7 @@ export default function Home() {
       {/* Footer */}
       <Container
         component="footer"
-        wrapperClassName="border-t border-border bg-background"
+        wrapperClassName="relative z-10 border-t border-border bg-background"
         className="py-12 max-w-7xl mx-auto"
       >
         <div className="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">

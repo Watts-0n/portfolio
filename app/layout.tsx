@@ -3,7 +3,6 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import SplashCursor from "@/components/ui/SplashCursor";
-import PixelBlast from "@/components/ui/background";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -51,27 +50,6 @@ export default function RootLayout({
       <body
         className={`font-body antialiased overflow-x-hidden ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
-        <div style={{ width: '100vw', height: '100%', position: 'absolute', zIndex: "1" }}>
-          <PixelBlast
-            variant="triangle"
-            pixelSize={4}
-            color="#c0c0c0"
-            patternScale={10}
-            patternDensity={0.2}
-            pixelSizeJitter={0}
-            enableRipples={false}
-            rippleSpeed={0.4}
-            rippleThickness={0.12}
-            rippleIntensityScale={1.5}
-            liquid={false}
-            liquidStrength={0.12}
-            liquidRadius={1.2}
-            liquidWobbleSpeed={5}
-            speed={0.5}
-            edgeFade={0}
-            transparent
-          />
-        </div>
         <SplashCursor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}

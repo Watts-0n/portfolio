@@ -59,7 +59,7 @@ const createTouchTexture = (): TouchTexture => {
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) throw new Error('2D context not available');
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -499,6 +499,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             const quad = new THREE.Mesh(quadGeom, material);
             scene.add(quad);
             const clock = new THREE.Clock();
+            let resizeTimer: ReturnType<typeof setTimeout> | null = null;
             const setSize = () => {
                 const w = container.clientWidth || 1;
                 const h = container.clientHeight || 1;
@@ -509,7 +510,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
             };
             setSize();
-            const ro = new ResizeObserver(setSize);
+            const ro = new ResizeObserver(() => {
+                if (resizeTimer) clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(setSize, 100);
+            });
             ro.observe(container);
             const randomFloat = (): number => {
                 if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
@@ -595,16 +599,25 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 passive: true
             });
             let raf = 0;
-            const animate = () => {
-                if (autoPauseOffscreen && !visibilityRef.current.visible) {
-                    raf = requestAnimationFrame(animate);
-                    return;
-                }
-                uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
+            const TARGET_FPS = 15;
+            const FRAME_INTERVAL = 1000 / TARGET_FPS;
+            let lastFrameTime = 0;
+            let lastRenderedTime = -1;
+            const animate = (now: number) => {
+                raf = requestAnimationFrame(animate);
+                if (autoPauseOffscreen && !visibilityRef.current.visible) return;
+                const elapsed = now - lastFrameTime;
+                if (elapsed < FRAME_INTERVAL) return;
+                lastFrameTime = now - (elapsed % FRAME_INTERVAL);
+                const currentTime = timeOffset + clock.getElapsedTime() * speedRef.current;
+                // Skip render if time hasn't changed (e.g. speed=0)
+                if (currentTime === lastRenderedTime) return;
+                lastRenderedTime = currentTime;
+                uniforms.uTime.value = currentTime;
                 if (liquidEffect) {
                     const liqEffect = liquidEffect as Effect & { uniforms: Map<string, THREE.Uniform> };
                     const timeUniform = liqEffect.uniforms.get('uTime');
-                    if (timeUniform) timeUniform.value = uniforms.uTime.value;
+                    if (timeUniform) timeUniform.value = currentTime;
                 }
                 if (composer) {
                     if (touch) touch.update();
@@ -613,13 +626,12 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                         if (pass.effects) {
                             pass.effects.forEach(eff => {
                                 const timeUniform = eff.uniforms?.get('uTime');
-                                if (timeUniform) timeUniform.value = uniforms.uTime.value;
+                                if (timeUniform) timeUniform.value = currentTime;
                             });
                         }
                     });
                     composer.render();
                 } else renderer.render(scene, camera);
-                raf = requestAnimationFrame(animate);
             };
             raf = requestAnimationFrame(animate);
             threeRef.current = {

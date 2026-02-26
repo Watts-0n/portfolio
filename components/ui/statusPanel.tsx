@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { GlassPanel } from "@/components/ui/glass-panel";
 
 const METRICS = [
     { key: "CPU_LOAD", base: 95, variance: 5 },
@@ -14,7 +15,7 @@ interface StatusPanelProps {
     projects: number;
 }
 
-export default function StatusPanel({ projects }:StatusPanelProps) {
+export default function StatusPanel({ projects }: StatusPanelProps) {
     const [values, setValues] = useState(METRICS.map((m) => m.base));
     const [uptime, setUptime] = useState(99.9);
     const [tick, setTick] = useState(0);
@@ -38,20 +39,16 @@ export default function StatusPanel({ projects }:StatusPanelProps) {
     }, []);
 
     return (
-        <div className="relative h-[500px] w-full border border-border/30 bg-card/10 backdrop-blur-sm p-8 shadow-xl">
-            <div className="absolute top-0 left-0 size-4 border-t-2 border-l-2 border-primary" />
-            <div className="absolute top-0 right-0 size-4 border-t-2 border-r-2 border-primary" />
-            <div className="absolute bottom-0 left-0 size-4 border-b-2 border-l-2 border-primary" />
-            <div className="absolute bottom-0 right-0 size-4 border-b-2 border-r-2 border-primary" />
+        <GlassPanel className="h-[500px] w-full p-8">
 
             <div className="h-full w-full flex flex-col justify-between font-mono text-xs text-muted-foreground">
                 {/* Header */}
                 <div className="flex justify-between">
                     <span>SYS.STATUS: NORMAL</span>
                     <span>
-            UPTIME:{" "}
+                        UPTIME:{" "}
                         <span className="transition-all duration-700">{uptime}%</span>
-          </span>
+                    </span>
                 </div>
 
                 {/* Main content */}
@@ -78,8 +75,8 @@ export default function StatusPanel({ projects }:StatusPanelProps) {
                                 <div className="flex justify-between">
                                     <span>{metric.key}</span>
                                     <span className="tabular-nums transition-all duration-700">
-                    {values[i]}%
-                  </span>
+                                        {values[i]}%
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -88,12 +85,12 @@ export default function StatusPanel({ projects }:StatusPanelProps) {
 
                 {/* Footer */}
                 <div className="text-right">
-          <span className="block text-4xl font-bold text-foreground tabular-nums transition-all duration-500">
-            {String(projects).padStart(2, "0")}
-          </span>
+                    <span className="block text-4xl font-bold text-foreground tabular-nums transition-all duration-500">
+                        {String(projects).padStart(2, "0")}
+                    </span>
                     <span>PROJECTS</span>
                 </div>
             </div>
-        </div>
+        </GlassPanel>
     );
 }

@@ -49,10 +49,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth shadcn">
       <body
-        className={`font-body antialiased ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
+        className={`font-body antialiased overflow-x-hidden ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
-      <div style={{ width: '100vw', height: '100%', position: 'absolute', zIndex:"1"}}>
-        <PixelBlast
+        <div style={{ width: '100vw', height: '100%', position: 'absolute', zIndex: "1" }}>
+          <PixelBlast
             variant="triangle"
             pixelSize={4}
             color="#c0c0c0"
@@ -70,8 +70,8 @@ export default function RootLayout({
             speed={0.5}
             edgeFade={0}
             transparent
-        />
-      </div>
+          />
+        </div>
         <SplashCursor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}

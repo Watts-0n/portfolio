@@ -2,7 +2,7 @@
 **Stitch Project ID:** `14179918346701536450`
 **Stitch Project Title:** Dāvids Locāns Portfolio — Engineering Terminal
 **Device Type:** Desktop-first (1280px canvas, responsive down to mobile)
-**Framework:** Next.js 16 (App Router) + Tailwind CSS v4 + TypeScript
+**Framework:** Next.js (App Router) + Tailwind CSS v4 + TypeScript
 
 ---
 
@@ -48,6 +48,13 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 | **Soft Gray Text** | `oklch(0.6 0.01 286)` ≈ `#918f98` | Muted foreground — reduced emphasis text |
 | **Ember Accent** | `oklch(0.25 0.02 286)` ≈ `#38363f` | Accent background, elevated surfaces |
 
+### Status Colors (Project States)
+| State | Color | Usage |
+|---|---|---|
+| **LIVE** | `text-primary` | Active, deployed projects |
+| **WIP** | `text-yellow-500` | Work-in-progress projects |
+| **ARCHIVED** | `text-muted-foreground` | Completed/retired projects |
+
 > **Critical note:** Light mode is near-achromatic — the primary (`#646464`) is a pure neutral gray. Dark mode introduces a **high-saturation lime-green primary** that creates dramatic contrast. Resist adding new hue families — the power is in the restraint.
 
 ---
@@ -63,13 +70,16 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 - `font-body` → Space Grotesk, 400 weight, normal letter-spacing (body text)
 
 ### Typographic Conventions
-- **Display headings** (`FULL Stack Dev_`, `SELECTED WORKS`, `TECH_STACK`, `INITIATE_CONTACT`): `font-display` class — JetBrains Mono Bold, **ALL CAPS** or mixed case, with underscores replacing spaces for the terminal metaphor. Sizes: `text-6xl md:text-8xl` for hero, `text-4xl md:text-6xl` for sections.
+- **Display headings** (`FULL Stack Dev_`, `SELECTED WORKS`, `TECH_STACK`, `INITIATE_CONTACT`, `TRANSMISSIONS`): `font-display` class — JetBrains Mono Bold, **ALL CAPS** or mixed case, with underscores replacing spaces for the terminal metaphor. Sizes: `text-6xl md:text-8xl` for hero, `text-4xl md:text-6xl` for sections.
+- **Section labels:** `font-mono text-xs text-muted-foreground` above each heading — format: `▸ SECTION 01`, `▸ SECTION 02`, etc. Acts as a breadcrumb/index for the page narrative.
 - **Navigation links** (`PROJECTS`, `SKILLS`, `LOGS`, `CONTACT`): `text-sm font-medium`, muted foreground, uppercase, wide tracking.
 - **Brand wordmark** (`Dāvids_Locāns`): `font-mono text-xl font-bold tracking-tighter` — underscore separator, primary-colored blinking cursor.
 - **Resume button** (`resume_v4.pdf`): `font-mono text-xs` — lowercase underscore notation, styled as a file reference.
 - **Tech badges** (`React`, `WebSocket`): `font-mono text-xs` in `<Badge>` components.
 - **Body text**: `text-base` or `md:text-xl`, Space Grotesk Regular, `text-muted-foreground`, `max-w-md`, relaxed line-height.
 - **System metrics labels** (`CPU_LOAD`, `GPU_LOAD`, `RAM`, `MEMORY`): `font-mono text-xs text-muted-foreground`, tabular numbers for value alignment.
+- **Code/terminal comments:** Prefixed with `//` — used for inline section labels (`// CORE ATTRIBUTES`, `// NEW_MESSAGE.init()`, `// TOOLS & STACK`). Always `font-mono text-xs text-muted-foreground`.
+- **Line numbers:** Zero-padded 3-digit monospace (`001`, `002`, `003`) — used in the Transmissions terminal list. `text-muted-foreground/40`.
 
 ---
 
@@ -101,36 +111,62 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 - **Footer stat:** Project count as `text-4xl font-bold` number (zero-padded: "05") with "PROJECTS" label below
 - **All text:** `font-mono text-xs text-muted-foreground`, `tabular-nums` for number alignment
 
-### Project Cards
-- **Container:** `rounded-none` (sharp squared-off corners), `bg-card border-border`, hover → `border-primary/50`
-- **Structure:** Two-zone — top image zone + bottom content zone (using `grid-rows-subgrid row-span-3`)
-- **Grid:** `grid-cols-[repeat(auto-fit,minmax(min(100%,250px),1fr))]` — responsive auto-fit with 250px minimum
-- **Image:** `<ProjectImage>` component (separate)
-- **Title:** `text-2xl font-display`, primary color on group hover
-- **Tech tags:** `<Badge variant="secondary">` with `font-mono text-xs`
-- **Footer links:** `LIVE DEMO` / `CODE` with external-link/github icons, `text-sm font-display`
+### Project Cards — Featured (First Project)
+- **Layout:** Full-width two-column split (`md:grid-cols-[1fr_1fr]`), minimum height `360px`
+- **Image side:** `overflow-hidden`, image scales to `105%` on `group-hover` (`transition-transform duration-700`), primary-tinted overlay on hover (`bg-primary/10`)
+- **Content side:** `p-8`, flex column layout, `justify-between`
+- **Ghost index number:** Absolute-positioned in top-right corner — `text-[80px] font-bold text-border` (very faint), `select-none pointer-events-none`. Acts as decorative layer.
+- **Status badge:** `◉ LIVE / WIP / ARCHIVED` — `font-mono text-[10px] tracking-widest`, colored by state
+- **Year label:** `font-mono text-[10px] text-muted-foreground` alongside `//` separator
+- **Title:** `text-3xl md:text-4xl font-display`, primary on `group-hover`
+- **Actions:** `LIVE DEMO` & `SOURCE` with `ArrowUpRight` / `Github` icons — micro-translate on hover
+
+### Project Cards — Grid (Remaining Projects)
+- **Container:** Zero-radius (`rounded-none`), no outer gaps — cards sit flush in a `border border-border` wrapper grid
+- **Grid:** `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` — 4 columns on desktop, internal `border-r border-b` dividers (CSS borders, no gap)
+- **Image strip:** Fixed height `h-40`, `overflow-hidden`, gradient fade `from-card to-transparent` from bottom
+- **Index overlay:** `font-mono text-xs text-muted-foreground` bottom-left in image area, zero-padded (`02`–`05`)
+- **Content area:** `p-4`, shows status badge, year, title, 2-line clamped description, truncated tags
+- **Tag truncation:** Show max 2 tags + `+N` overflow badge
+- **Actions:** Tiny `font-mono text-[9px]` links (`DEMO`, `CODE`) separated by `border-t border-border`
 
 ### Skills Section
-- **Background:** `bg-secondary/20` tinted surface band
-- **Layout:** 12-column grid — 4 cols for title/icons, 8 cols for skill lists
-- **Skill icons:** Perfect square boxes (`aspect-square`), thin 1px border, center icon + monospace label below (`CLEAN_CODE`, `SCALABLE_DB`, etc.)
-- **Skill lists:** Three-column grid with category headers (`border-b border-primary/30`), items as `font-mono text-sm` with hover-to-primary accent bars
+- **Background:** `bg-secondary/10` tinted surface band
+- **Layout:** 12-column grid — 8 cols for skill groups with bars, 4 cols for attribute tiles + tools
+- **Category headers:** `font-display text-sm tracking-widest uppercase` with category icon (`Code2`, `Database`, `Terminal`) and `border-b border-primary/30` underline
+- **Skill bars (`SkillBar` component):**
+  - Three-column row: skill name (`w-24 font-mono text-xs`) | animated fill bar (`flex-1 h-[2px]`) | percentage label (`w-8 font-mono text-[10px] text-right`)
+  - Bar track: `bg-border`, fill: `bg-primary`
+  - Animation: `transition-all duration-1000 ease-out`, triggered on scroll via `IntersectionObserver`, stagger delay by group + index
+- **Core Attribute tiles:** `aspect-auto p-4 border border-border bg-background` — icon + `font-mono text-[10px] font-bold` label + `font-mono text-[9px] text-muted-foreground` description
+  - **Corner accent on hover:** absolute `w-4 h-[2px]` and `w-[2px] h-4` at top-left — primary color, fades in with `group-hover`
+- **Tools tag row:** Flat inline tags — `font-mono text-[9px] px-2 py-1 border border-border hover:border-primary hover:text-primary` — no background, just border outline
 
 ### Blog / Transmissions Section
-- **Layout:** Simple vertical stack with horizontal dividers
-- **Title rows:** `grid md:grid-cols-[1fr_auto]` — title left, date/readtime right
-- **Blog title:** `text-2xl font-display`, primary on group hover
-- **Date format:** `font-mono text-xs text-muted-foreground`, double-slash separated (`Oct 12, 2024 // 5 min read`)
-- **Dividers:** `h-[1px] bg-border group-hover:bg-primary/50 transition-colors`
-- **Bottom CTA:** Centered ghost button `VIEW ALL POSTS`
+- **Container:** Single `border border-border` wrapper — the entire list lives inside one bordered box
+- **Terminal bar header:**
+  - Three colored dots: `w-2.5 h-2.5 rounded-full` in `bg-red-400/60`, `bg-yellow-400/60`, `bg-green-400/60`
+  - Path label: `font-mono text-xs text-muted-foreground` — `~/logs/transmissions`
+  - Background: `bg-card`, separated by `border-b border-border`
+- **Post row layout:** `grid md:grid-cols-[60px_1fr_auto]` — line number column | content | metadata column
+- **Line number column:** `font-mono text-xs text-muted-foreground/40`, `border-r border-border`, `flex items-center justify-center`
+- **Content area:** `p-6` — topic tags (outlined, `border border-primary/30 text-primary font-mono text-[9px]`), title `text-xl md:text-2xl font-display`, excerpt `text-sm text-muted-foreground`
+- **Metadata column:** `border-l border-border min-w-[120px]` — date, read time with `Clock` icon, `ArrowUpRight` arrow that micro-translates on `group-hover`
+- **Row hover:** `hover:bg-card transition-colors duration-200`
+- **Section CTA:** `VIEW ALL` ghost button — top-right alignment on desktop, centered below on mobile
 
-### Contact Form
-- **Container:** `bg-card border-t border-border` full-width band
-- **Form width:** `max-w-2xl` centered
-- **Headers:** Center-aligned `text-4xl font-display` title + muted description
-- **Labels:** `text-xs font-mono text-muted-foreground` — ALL CAPS above fields
-- **Inputs:** `<Input>` and `<Textarea>` shadcn components — 1px border, sharp corners, clean focus state
-- **Submit:** Full-width primary button `SEND TRANSMISSION`, `size="lg"`
+### Contact Section
+- **Layout:** Two-column grid (`md:grid-cols-2 gap-16`) — info/labels left, form right
+- **Left column:**
+  - Section label (`▸ SECTION 04`), large heading, primary accent bar
+  - Description paragraph (`max-w-xs`)
+  - **Contact method list:** Each entry — `w-8 h-8 border border-border` icon box + label/value stack. Icon box and value both transition to `text-primary border-primary` on `group-hover`
+- **Right column (form wrapper):**
+  - **Corner bracket decoration:** Four absolute-positioned `div` elements at each corner — `w-6 h-6`, `border-t-2 border-l-2 border-primary` etc. Offset `-3px` outside the form box. Purely visual.
+  - Inner box: `p-8 border border-border bg-background`
+  - Header comment: `// NEW_MESSAGE.init()` — `font-mono text-[10px] text-muted-foreground`
+  - Fields: NAME, EMAIL, SUBJECT, MESSAGE — labels `text-xs font-mono text-muted-foreground tracking-widest`, inputs `rounded-none border-border font-mono text-sm`
+  - Submit: Full-width `rounded-none` primary button with `ArrowRight` icon
 
 ### Buttons (Design Tokens via `button.tsx`)
 | Variant | Fill | Text | Border | Shape |
@@ -139,9 +175,20 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 | **Outline / Ghost** | Transparent / `bg-accent` on hover | `text-foreground` | `border-input` | Same radius |
 | **Secondary** | `bg-secondary` | `text-secondary-foreground` | None | Same radius |
 
+> Forms use `rounded-none` inputs/buttons for a sharper, terminal-appropriate feel — overriding the default radius.
+
 ### Section Dividers
 - Single 1px `border-border` — purely structural, full-width
-- Used between all major sections: hero → works → skills → blog → contact → footer
+- Used between all major sections: hero → works → skills → transmissions → contact → footer
+
+### Section Headers (Shared Pattern)
+Every section follows this consistent header structure:
+```
+▸ SECTION 0N          ← font-mono text-xs text-muted-foreground, mb-3
+SECTION TITLE         ← text-4xl md:text-6xl font-display tracking-tighter, mb-4
+━━━━━━━━             ← h-[2px] w-24 bg-primary (primary accent bar)
+```
+Section subtitle/description aligns right on desktop (`hidden md:block text-right`), or below the bar on mobile.
 
 ---
 
@@ -150,27 +197,56 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 ### Grid & Spacing
 - **Container:** Centered `max-w-7xl` (1280px) with safe-area padding (`--safe-area-left/right`, defaults to `1rem`, `2rem` at 1024px+)
 - **Section rhythm:** Consistent `py-24` (96px top/bottom padding) per section — massive breathing room
-- **Project grid gaps:** 24px (`gap-6`)
-- **Skill grid gaps:** 48px between major sections (`gap-12`), 32px between sub-columns (`gap-8`)
+- **Featured project:** Full-width `border border-border`, no outer margins
+- **Project grid:** Zero-gap internal grid with CSS border dividers — cards share borders to form a unified panel
+- **Skill grid gaps:** 48px between major sections (`gap-8`), 20px between sub-items (`space-y-5`)
+- **Contact grid gap:** `gap-16` between the two columns
 
 ### Background System
 Three visual layers composited (back to front):
 1. **PixelBlast canvas** — Fullscreen triangle-variant particle field in `#c0c0c0`, pattern scale 10, density 0.2, moving at 0.5 speed. Creates a living, geometric texture.
-2. **Section backgrounds** — Some sections add `bg-secondary/20` or `bg-card` tinted bands to create depth
+2. **Section backgrounds** — Some sections add `bg-secondary/10` or `bg-card/50` tinted bands to create depth
 3. **Content** — Uses `relative z-10` to float above the background particles
 
 ### Alignment
 - Section headers: **Left-aligned** with text flowing from container left edge
-- Contact section: **Center-aligned** (exception — anchors the form)
-- Footer: `flex-row justify-between` with copyright left, social links right
-- Body text: Left-aligned with `max-w-md` or `max-w-sm` natural line length constraints
+- Section subtitles: **Right-aligned** (desktop only, `hidden md:block`) — creates typographic tension
+- Contact section: **Two-column split** (exception — info left, form right)
+- Footer: `flex-row justify-between` with brand + copyright left, social links right
+- Body text: Left-aligned with `max-w-xs` or `max-w-sm` natural line length constraints
 
 ### Whitespace Philosophy
-Whitespace **is** the design. The triangle particle background transforms empty space from "blank" to "alive" — it becomes structural, intentional, and dynamic. Sections breathe with 96px padding; grids use disciplined 24px gaps. The result feels engineered, not sparse.
+Whitespace **is** the design. The triangle particle background transforms empty space from "blank" to "alive" — it becomes structural, intentional, and dynamic. Sections breathe with 96px padding; grids use disciplined spacing. The result feels engineered, not sparse.
 
 ---
 
-## 6. Design System Notes for Stitch Generation
+## 6. Interactive & Animation Patterns
+
+### Skill Bar Animation (`SkillBar` component)
+- **Trigger:** `IntersectionObserver` — fires when the container enters viewport (`threshold: 0.1`)
+- **Behavior:** Width transitions from `0%` to target level over `1000ms` with `ease-out`
+- **Stagger:** Each bar delayed by `groupIndex * 150ms + skillIndex * 100ms`
+- **State:** Managed via `useState(0)` — one-shot (observer disconnects after firing)
+
+### Image Hover Effects
+- All project images: `group-hover:scale-105 transition-transform duration-700` — subtle zoom
+- Featured project: Additional `bg-primary/10 opacity-0 group-hover:opacity-100` tint overlay
+
+### Corner Bracket Hover (Attribute Tiles)
+- On hover: two 1px lines appear at top-left corner (`w-4 h-[2px]` + `w-[2px] h-4`) in `bg-primary`
+- `opacity-0 group-hover:opacity-100 transition-opacity`
+
+### Link Arrow Micro-animation
+- `ArrowUpRight` icon: `group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform`
+- Creates a subtle diagonal "exit" motion — reinforces external link semantics
+
+### Row Highlights
+- Blog post rows: `hover:bg-card transition-colors duration-200`
+- Project grid cells: `hover:bg-card transition-colors duration-300`
+
+---
+
+## 7. Design System Notes for Stitch Generation
 
 > **Copy this entire section into every Stitch prompt to ensure visual consistency.**
 
@@ -192,23 +268,40 @@ DESIGN SYSTEM (REQUIRED):
   - Primary Accent: Electric Lime (#a8d600 / oklch(0.88 0.2 120)) — vivid chartreuse
   - Primary Text: High Signal White (#fafafa / oklch(0.98 0 0))
   - Borders: Dim Gray (#2c2a35 / oklch(0.2 0.02 286))
+- STATUS COLORS:
+  - LIVE: text-primary (green indicator ◉)
+  - WIP: text-yellow-500 (yellow indicator ◉)
+  - ARCHIVED: text-muted-foreground (gray indicator ◉)
 - TYPOGRAPHY:
   - Display/Headings: JetBrains Mono Bold — ALL CAPS, tight tracking, underscore-separated labels
   - UI/Labels: JetBrains Mono Regular — ALL CAPS monospace, for navigation, buttons, badges
   - Body: Space Grotesk Regular — sentence case, relaxed line height
+  - Section index labels: "▸ SECTION 0N" format — font-mono text-xs text-muted-foreground
+  - Terminal comments: "// LABEL" format — font-mono text-xs text-muted-foreground
+  - Line numbers: "001", "002" zero-padded — font-mono text-xs text-muted-foreground/40
 - COMPONENTS:
-  - Buttons: Rounded-md (~0.5rem radius), primary fill or ghost/outline variants
-  - Cards: sharp squared-off corners (rounded-none), two-zone (image top / content bottom), 1px border
-  - Inputs: Sharp corners, 1px border, no shadow, mono labels above
+  - Buttons: Rounded-md (~0.5rem radius) default; rounded-none inside forms for terminal feel
+  - Cards (featured): Full-width two-column split, ghost index number (text-[80px] text-border), status badge
+  - Cards (grid): Zero-gap flush grid with CSS border dividers, image strip + compact content
+  - Inputs: rounded-none, 1px border, no shadow, ALLCAPS mono labels above
   - Status panels: CSS corner-bracket decoration (L-shaped borders at corners), backdrop-blur
-  - Progress bars: 1px thin tracks with animated fill, monospace labels
+  - Progress bars: h-[2px] thin tracks with animated fill (IntersectionObserver trigger), mono labels
+  - Attribute tiles: border box with corner-accent hover effect (primary color micro-lines)
+  - Terminal window: macOS-style color dots header + monospace path label + bordered post list
+  - Contact form: corner bracket decoration (6px primary accent lines outside box corners)
 - LAYOUT:
-  - max-w-7xl container, py-24 section spacing, gap-6 card grids
-  - Particle background (triangles, silver, low density) as persistent ambient texture
+  - max-w-7xl container, py-24 section spacing
+  - Section headers: left-aligned heading + right-aligned subtitle (desktop only)
+  - Consistent "▸ SECTION 0N" label above every section heading
+  - Project layout: 1 featured full-width + N-column flush grid below
 - EFFECTS:
   - DecryptedText animation (terminal decode) on hero heading
   - SplashCursor fluid effect following mouse
-  - Animated metric bars (CPU/GPU/RAM) with random fluctuation
+  - Animated metric bars (CPU/GPU/RAM) with random fluctuation in status panel
+  - Animated skill bars (width 0→target%, eased, stagger by group+index, scroll-triggered)
   - Frosted glass nav bar (backdrop-blur-md, bg-background/80)
+  - Image zoom on hover (scale-105, 700ms)
+  - Corner accent micro-lines on attribute tile hover
+  - Arrow icon micro-translate on link hover (diagonal exit motion)
 - STYLE KEYWORDS: Engineering Terminal, Brutalist-Tech, System Dashboard, Monospace, Blueprint, Achromatic (light), Electrified (dark), Clinical, Precise
 ```

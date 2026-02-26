@@ -55,7 +55,7 @@
 }
 
 :root {
-  --main-color:#646464;
+  --main-color: #646464;
   --primary: var(--main-color);
   --primary-foreground: oklch(0.98 0 0);
   --sidebar-primary: var(--main-color);
@@ -128,7 +128,8 @@
 
 @media (min-width: 1024px) {
   :root {
-    --m: 2rem; /* spacing-8 = 2rem */
+    --m: 2rem;
+    /* spacing-8 = 2rem */
   }
 }
 
@@ -157,4 +158,24 @@
   font-family: var(--font-body-family);
   font-weight: var(--font-body-weight);
   letter-spacing: var(--font-body-tracking);
+}
+
+/* Background textures */
+@utility bg-dot-grid {
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+@utility bg-grid-lines {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@utility bg-cross-grid {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
 }

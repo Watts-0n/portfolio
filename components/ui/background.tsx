@@ -52,10 +52,19 @@ type PixelBlastProps = {
     transparent?: boolean;
     edgeFade?: number;
     noiseAmount?: number;
+    mobileOptimized?: boolean;
 };
 
-const createTouchTexture = (): TouchTexture => {
-    const size = 64;
+const isMobileDevice = (): boolean => {
+    if (typeof window === 'undefined') return false;
+    return (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+        ) || window.matchMedia('(max-width: 768px)').matches
+    );
+};
+
+const createTouchTexture = (size = 64): TouchTexture => {
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
@@ -353,14 +362,14 @@ const MAX_CLICKS = 10;
 
 const PixelBlast: React.FC<PixelBlastProps> = ({
     variant = 'square',
-    pixelSize = 3,
+    pixelSize: propPixelSize,
     color = '#B19EEF',
     className,
     style,
-    antialias = true,
-    patternScale = 2,
-    patternDensity = 1,
-    liquid = false,
+    antialias: propAntialias,
+    patternScale: propPatternScale,
+    patternDensity: propPatternDensity,
+    liquid: propLiquid,
     liquidStrength = 0.1,
     liquidRadius = 1,
     pixelSizeJitter = 0,
@@ -373,11 +382,27 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
     speed = 0.5,
     transparent = true,
     edgeFade = 0.5,
-    noiseAmount = 0
+    noiseAmount: propNoiseAmount,
+    mobileOptimized = true
 }) => {
+    const isMobile = mobileOptimized && isMobileDevice();
+
+    // Apply mobile-optimized defaults
+    const pixelSize = propPixelSize ?? (isMobile ? 5 : 3);
+    const antialias = propAntialias ?? !isMobile;
+    const patternScale = propPatternScale ?? 2;
+    const patternDensity = propPatternDensity ?? (isMobile ? 0.8 : 1);
+    const liquid = propLiquid ?? false; // Liquid disabled by default on all platforms
+    const noiseAmount = propNoiseAmount ?? (isMobile ? 0 : 0);
+
     const containerRef = useRef<HTMLDivElement | null>(null);
     const visibilityRef = useRef({ visible: true });
     const speedRef = useRef(speed);
+    const eventListenersRef = useRef<Array<{
+        element: HTMLElement | Document;
+        event: string;
+        handler: EventListener;
+    }>>([]);
 
     const threeRef = useRef<{
         renderer: THREE.WebGLRenderer;
@@ -410,14 +435,60 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         composer?: EffectComposer;
         touch?: ReturnType<typeof createTouchTexture>;
         liquidEffect?: Effect;
+        contextLostHandler?: (e: WebGLContextEvent) => void;
+        contextRestoredHandler?: (e: WebGLContextEvent) => void;
     } | null>(null);
+
     const prevConfigRef = useRef<ReinitConfig | null>(null);
+
+    // Handle visibility changes for autoPause
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            visibilityRef.current.visible = !document.hidden;
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, []);
+
+    // Handle orientation changes
+    useEffect(() => {
+        const handleOrientationChange = () => {
+            if (threeRef.current) {
+                // Trigger a size update after orientation change settles
+                setTimeout(() => {
+                    const container = containerRef.current;
+                    if (container && threeRef.current) {
+                        const w = container.clientWidth || 1;
+                        const h = container.clientHeight || 1;
+                        threeRef.current.renderer.setSize(w, h, false);
+                        threeRef.current.uniforms.uResolution.value.set(
+                            threeRef.current.renderer.domElement.width,
+                            threeRef.current.renderer.domElement.height
+                        );
+                        if (threeRef.current.composer) {
+                            threeRef.current.composer.setSize(
+                                threeRef.current.renderer.domElement.width,
+                                threeRef.current.renderer.domElement.height
+                            );
+                        }
+                    }
+                }, 100);
+            }
+        };
+
+        window.addEventListener('orientationchange', handleOrientationChange);
+        return () => window.removeEventListener('orientationchange', handleOrientationChange);
+    }, []);
+
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
+
         speedRef.current = speed;
         const needsReinitKeys: (keyof ReinitConfig)[] = ['antialias', 'liquid', 'noiseAmount'];
         const cfg: ReinitConfig = { antialias, liquid, noiseAmount };
+
         let mustReinit = false;
         if (!threeRef.current) mustReinit = true;
         else if (prevConfigRef.current) {
@@ -427,7 +498,9 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                     break;
                 }
         }
+
         if (mustReinit) {
+            // Cleanup previous instance
             if (threeRef.current) {
                 const t = threeRef.current;
                 t.resizeObserver?.disconnect();
@@ -436,17 +509,37 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 t.material.dispose();
                 t.composer?.dispose();
                 t.renderer.dispose();
-                if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
+
+                // Remove event listeners
+                eventListenersRef.current.forEach(({ element, event, handler }) => {
+                    element.removeEventListener(event, handler);
+                });
+                eventListenersRef.current = [];
+
+                // Remove context event listeners
+                if (t.contextLostHandler)
+                    t.renderer.domElement.removeEventListener(
+                        'webglcontextlost' as keyof HTMLElementEventMap,
+                        t.contextLostHandler as EventListener
+                    );
+                if (t.contextRestoredHandler)
+                    t.renderer.domElement.removeEventListener(
+                        'webglcontextrestored' as keyof HTMLElementEventMap,
+                        t.contextRestoredHandler as EventListener
+                    );
+
+                if (t.renderer.domElement.parentElement === container)
+                    container.removeChild(t.renderer.domElement);
                 threeRef.current = null;
             }
+
             const canvas = document.createElement('canvas');
-            // Check WebGL availability before attempting to create the renderer.
-            // WebGL may be sandboxed, disabled, or unavailable (e.g., headless browsers).
             const testCtx = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
             if (!testCtx) {
-                console.warn('PixelBlast: WebGL is not available in this environment. Skipping background animation.');
+                console.warn('PixelBlast: WebGL is not available in this environment.');
                 return;
             }
+
             let renderer: THREE.WebGLRenderer;
             try {
                 renderer = new THREE.WebGLRenderer({
@@ -459,12 +552,15 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 console.warn('PixelBlast: Failed to create WebGL renderer.', e);
                 return;
             }
+
             renderer.domElement.style.width = '100%';
             renderer.domElement.style.height = '100%';
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2));
             container.appendChild(renderer.domElement);
+
             if (transparent) renderer.setClearAlpha(0);
             else renderer.setClearColor(0x000000, 1);
+
             const uniforms = {
                 uResolution: { value: new THREE.Vector2(0, 0) },
                 uTime: { value: 0 },
@@ -484,6 +580,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uRippleIntensity: { value: rippleIntensityScale },
                 uEdgeFade: { value: edgeFade }
             };
+
             const scene = new THREE.Scene();
             const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
             const material = new THREE.ShaderMaterial({
@@ -495,26 +592,43 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 depthWrite: false,
                 glslVersion: THREE.GLSL3
             });
+
             const quadGeom = new THREE.PlaneGeometry(2, 2);
             const quad = new THREE.Mesh(quadGeom, material);
             scene.add(quad);
+
             const clock = new THREE.Clock();
+
             let resizeTimer: ReturnType<typeof setTimeout> | null = null;
             const setSize = () => {
                 const w = container.clientWidth || 1;
                 const h = container.clientHeight || 1;
+
+                if (w === 0 || h === 0) return; // Avoid rendering to zero-sized canvas
+
                 renderer.setSize(w, h, false);
-                uniforms.uResolution.value.set(renderer.domElement.width, renderer.domElement.height);
+                uniforms.uResolution.value.set(
+                    renderer.domElement.width,
+                    renderer.domElement.height
+                );
                 if (threeRef.current?.composer)
-                    threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
+                    threeRef.current.composer.setSize(
+                        renderer.domElement.width,
+                        renderer.domElement.height
+                    );
                 uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
             };
+
             setSize();
+
             const ro = new ResizeObserver(() => {
                 if (resizeTimer) clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(setSize, 100);
+                // More aggressive debounce on mobile
+                const debounceMs = isMobile ? 200 : 100;
+                resizeTimer = setTimeout(setSize, debounceMs);
             });
             ro.observe(container);
+
             const randomFloat = (): number => {
                 if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
                     const u32 = new Uint32Array(1);
@@ -523,12 +637,17 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 }
                 return Math.random();
             };
+
             const timeOffset = randomFloat() * 1000;
+
             let composer: EffectComposer | undefined;
             let touch: ReturnType<typeof createTouchTexture> | undefined;
             let liquidEffect: Effect | undefined;
+
             if (liquid) {
-                touch = createTouchTexture();
+                // Reduce texture size on mobile
+                const touchTextureSize = isMobile ? 32 : 64;
+                touch = createTouchTexture(touchTextureSize);
                 touch.radiusScale = liquidRadius;
                 composer = new EffectComposer(renderer);
                 const renderPass = new RenderPass(scene, camera);
@@ -541,6 +660,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 composer.addPass(renderPass);
                 composer.addPass(effectPass);
             }
+
             if (noiseAmount > 0) {
                 if (!composer) {
                     composer = new EffectComposer(renderer);
@@ -566,7 +686,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 }
                 composer.addPass(noisePass);
             }
-            if (composer) composer.setSize(renderer.domElement.width, renderer.domElement.height);
+
+            if (composer)
+                composer.setSize(renderer.domElement.width, renderer.domElement.height);
+
             const mapToPixels = (e: PointerEvent) => {
                 const rect = renderer.domElement.getBoundingClientRect();
                 const scaleX = renderer.domElement.width / rect.width;
@@ -580,45 +703,110 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                     h: renderer.domElement.height
                 };
             };
+
             const onPointerDown = (e: PointerEvent) => {
                 const { fx, fy } = mapToPixels(e);
                 const ix = threeRef.current?.clickIx ?? 0;
                 uniforms.uClickPos.value[ix].set(fx, fy);
                 uniforms.uClickTimes.value[ix] = uniforms.uTime.value;
                 if (threeRef.current) threeRef.current.clickIx = (ix + 1) % MAX_CLICKS;
+
+                // Haptic feedback on mobile
+                if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
             };
+
             const onPointerMove = (e: PointerEvent) => {
                 if (!touch) return;
                 const { fx, fy, w, h } = mapToPixels(e);
-                touch.addTouch({ x: fx / w, y: fy / h });
+                // Batch updates using microtask to avoid blocking
+                queueMicrotask(() => {
+                    touch!.addTouch({ x: fx / w, y: fy / h });
+                });
             };
-            renderer.domElement.addEventListener('pointerdown', onPointerDown, {
-                passive: true
-            });
-            renderer.domElement.addEventListener('pointermove', onPointerMove, {
-                passive: true
-            });
+
+            // Use touchstart for better mobile responsiveness
+            const onTouchStart = (e: TouchEvent) => {
+                if (e.touches.length === 0) return;
+                const touch = e.touches[0];
+                const pointerEvent = new PointerEvent('pointerdown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY,
+                    isPrimary: true
+                });
+                onPointerDown(pointerEvent);
+            };
+
+            const onTouchMove = (e: TouchEvent) => {
+                if (e.touches.length === 0) return;
+                const touch = e.touches[0];
+                const pointerEvent = new PointerEvent('pointermove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                onPointerMove(pointerEvent);
+            };
+
+            const addEventListenerTracked = (element: HTMLElement | Document, event: string, handler: EventListenerOrEventListenerObject) => {
+                element.addEventListener(event, handler, { passive: true });
+                eventListenersRef.current.push({ element, event, handler: handler as EventListener });
+            };
+
+            addEventListenerTracked(renderer.domElement, 'pointerdown', onPointerDown as EventListener);
+            addEventListenerTracked(renderer.domElement, 'pointermove', onPointerMove as EventListener);
+
+            // Add touch-specific listeners for mobile
+            if (isMobile) {
+                addEventListenerTracked(renderer.domElement, 'touchstart', onTouchStart as EventListener);
+                addEventListenerTracked(renderer.domElement, 'touchmove', onTouchMove as EventListener);
+            }
+
+            // WebGL context loss recovery
+            const contextLostHandler = (e: WebGLContextEvent) => {
+                e.preventDefault();
+                console.warn('WebGL context lost, attempting recovery...');
+            };
+
+            const contextRestoredHandler = () => {
+                console.log('WebGL context restored');
+                // Force re-render after context restoration
+                uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
+            };
+
+            renderer.domElement.addEventListener('webglcontextlost' as keyof HTMLElementEventMap, contextLostHandler as EventListener);
+            renderer.domElement.addEventListener('webglcontextrestored' as keyof HTMLElementEventMap, contextRestoredHandler as EventListener);
+
             let raf = 0;
-            const TARGET_FPS = 15;
+            const TARGET_FPS = isMobile ? 10 : 15;
             const FRAME_INTERVAL = 1000 / TARGET_FPS;
             let lastFrameTime = 0;
             let lastRenderedTime = -1;
+
             const animate = (now: number) => {
                 raf = requestAnimationFrame(animate);
+
                 if (autoPauseOffscreen && !visibilityRef.current.visible) return;
+
                 const elapsed = now - lastFrameTime;
                 if (elapsed < FRAME_INTERVAL) return;
+
                 lastFrameTime = now - (elapsed % FRAME_INTERVAL);
+
                 const currentTime = timeOffset + clock.getElapsedTime() * speedRef.current;
-                // Skip render if time hasn't changed (e.g. speed=0)
+
+                // Skip render if time hasn't changed
                 if (currentTime === lastRenderedTime) return;
                 lastRenderedTime = currentTime;
+
                 uniforms.uTime.value = currentTime;
+
                 if (liquidEffect) {
                     const liqEffect = liquidEffect as Effect & { uniforms: Map<string, THREE.Uniform> };
                     const timeUniform = liqEffect.uniforms.get('uTime');
                     if (timeUniform) timeUniform.value = currentTime;
                 }
+
                 if (composer) {
                     if (touch) touch.update();
                     composer.passes.forEach(p => {
@@ -631,9 +819,13 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                         }
                     });
                     composer.render();
-                } else renderer.render(scene, camera);
+                } else {
+                    renderer.render(scene, camera);
+                }
             };
+
             raf = requestAnimationFrame(animate);
+
             threeRef.current = {
                 renderer,
                 scene,
@@ -648,9 +840,12 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 timeOffset,
                 composer,
                 touch,
-                liquidEffect
+                liquidEffect,
+                contextLostHandler,
+                contextRestoredHandler
             };
         } else {
+            // Update uniforms without reinitializing
             const t = threeRef.current!;
             t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
             t.uniforms.uPixelSize.value = pixelSize * t.renderer.getPixelRatio();
@@ -663,8 +858,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             t.uniforms.uRippleThickness.value = rippleThickness;
             t.uniforms.uRippleSpeed.value = rippleSpeed;
             t.uniforms.uEdgeFade.value = edgeFade;
+
             if (transparent) t.renderer.setClearAlpha(0);
             else t.renderer.setClearColor(0x000000, 1);
+
             if (t.liquidEffect) {
                 const liqEffect = t.liquidEffect as Effect & { uniforms: Map<string, THREE.Uniform> };
                 const uStrength = liqEffect.uniforms.get('uStrength');
@@ -672,12 +869,16 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 const uFreq = liqEffect.uniforms.get('uFreq');
                 if (uFreq) uFreq.value = liquidWobbleSpeed;
             }
+
             if (t.touch) t.touch.radiusScale = liquidRadius;
         }
+
         prevConfigRef.current = cfg;
+
         return () => {
             if (threeRef.current && mustReinit) return;
             if (!threeRef.current) return;
+
             const t = threeRef.current;
             t.resizeObserver?.disconnect();
             cancelAnimationFrame(t.raf!);
@@ -685,7 +886,28 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             t.material.dispose();
             t.composer?.dispose();
             t.renderer.dispose();
-            if (t.renderer.domElement.parentElement === container) container.removeChild(t.renderer.domElement);
+
+            // Remove event listeners
+            eventListenersRef.current.forEach(({ element, event, handler }) => {
+                element.removeEventListener(event, handler);
+            });
+            eventListenersRef.current = [];
+
+            // Remove context event listeners
+            if (t.contextLostHandler)
+                t.renderer.domElement.removeEventListener(
+                    'webglcontextlost' as keyof HTMLElementEventMap,
+                    t.contextLostHandler as EventListener
+                );
+            if (t.contextRestoredHandler)
+                t.renderer.domElement.removeEventListener(
+                    'webglcontextrestored' as keyof HTMLElementEventMap,
+                    t.contextRestoredHandler as EventListener
+                );
+
+            if (t.renderer.domElement.parentElement === container)
+                container.removeChild(t.renderer.domElement);
+
             threeRef.current = null;
         };
     }, [
@@ -708,7 +930,8 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         autoPauseOffscreen,
         variant,
         color,
-        speed
+        speed,
+        isMobile
     ]);
 
     return (

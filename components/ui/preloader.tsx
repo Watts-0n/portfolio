@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { globalLoadingState } from "@/lib/loading-state";
 
 const BOOT_SEQUENCE = [
     "INIT_SYSTEM_BOOT...",
@@ -14,37 +15,124 @@ const BOOT_SEQUENCE = [
 ];
 
 export function Preloader() {
-    const [lines, setLines] = useState<string[]>([]);
+    const [activeIndex, setActiveIndex] = useState(-1);
     const [isComplete, setIsComplete] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
+    const [actualProgress, setActualProgress] = useState(0);
+
+    const visibleLines = BOOT_SEQUENCE.slice(0, activeIndex + 1);
+
+    // Track actual page loading progress
+    useEffect(() => {
+        let maxAssets = 0;
+        let loadedAssets = 0;
+
+        const updateProgress = () => {
+            if (maxAssets === 0) {
+                setActualProgress(100);
+            } else {
+                setActualProgress(Math.floor((loadedAssets / maxAssets) * 100));
+            }
+        };
+
+        const handleAssetLoad = () => {
+            loadedAssets++;
+            updateProgress();
+        };
+
+        const checkAssets = () => {
+            const images = Array.from(document.images);
+            const videos = Array.from(document.querySelectorAll("video"));
+            const media = [...images, ...videos];
+
+            maxAssets = media.length;
+            loadedAssets = 0;
+
+            if (maxAssets === 0) {
+                setActualProgress(100);
+            } else {
+                media.forEach((asset) => {
+                    if (asset instanceof HTMLImageElement) {
+                        if (asset.complete) {
+                            loadedAssets++;
+                        } else {
+                            asset.addEventListener("load", handleAssetLoad, { once: true });
+                            asset.addEventListener("error", handleAssetLoad, { once: true });
+                        }
+                    } else if (asset instanceof HTMLVideoElement) {
+                        if (asset.readyState >= 3) {
+                            loadedAssets++;
+                        } else {
+                            asset.addEventListener("canplaythrough", handleAssetLoad, { once: true });
+                            asset.addEventListener("error", handleAssetLoad, { once: true });
+                        }
+                    }
+                });
+                updateProgress();
+            }
+        };
+
+        if (document.readyState === "complete") {
+            checkAssets();
+        } else {
+            window.addEventListener("load", checkAssets);
+        }
+
+        // Backup safeguard - force completion after 8s so users never get stuck
+        const timeout = setTimeout(() => {
+            setActualProgress(100);
+        }, 3000);
+
+        return () => {
+            window.removeEventListener("load", checkAssets);
+            clearTimeout(timeout);
+        };
+    }, []);
 
     useEffect(() => {
-        let currentLine = 0;
+        let current = activeIndex === -1 ? 0 : activeIndex;
 
-        const interval = setInterval(() => {
-            if (currentLine < BOOT_SEQUENCE.length) {
-                setLines((prev) => [...prev, BOOT_SEQUENCE[currentLine]]);
-                currentLine++;
-            } else {
+        const advanceSequence = () => {
+            if (current < BOOT_SEQUENCE.length - 1) {
+                // Stop at VERIFYING_INTEGRITY (index 5) if loading is not complete
+                if (current === BOOT_SEQUENCE.length - 2 && actualProgress < 100) {
+                    return;
+                }
+                setActiveIndex(current);
+                current++;
+            } else if (current === BOOT_SEQUENCE.length - 1) {
+                // Final step (SYSTEM_ONLINE)
+                setActiveIndex(current);
+                current++;
                 clearInterval(interval);
                 setTimeout(() => {
                     setIsComplete(true);
-                    setTimeout(() => setIsVisible(false), 800); // Wait for exit animation
-                }, 500); // Brief pause after SYSTEM_ONLINE
+                    globalLoadingState.setLoaded(true);
+                    setTimeout(() => {
+                        setIsVisible(false);
+                    }, 1100); // Wait for exit animation (800ms) + small buffer
+                }, 400); // Reduced pause after SYSTEM_ONLINE
             }
-        }, 300); // Delay between lines
+        };
+
+        const interval = setInterval(advanceSequence, 150); // Faster delay between lines
 
         return () => clearInterval(interval);
-    }, []);
+    }, [actualProgress, activeIndex]);
 
     if (!isVisible) return null;
+
+    const visualProgressWidth = Math.max(
+        ((activeIndex + 1) / BOOT_SEQUENCE.length) * 100,
+        actualProgress * ((BOOT_SEQUENCE.length - 1) / BOOT_SEQUENCE.length)
+    );
 
     return (
         <AnimatePresence>
             {!isComplete && (
                 <motion.div
                     initial={{ opacity: 1 }}
-                    exit={{ opacity: 0, y: "-100%" }}
+                    exit={{ y: "-100%" }}
                     transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
                     className="fixed inset-0 z-100 bg-background flex flex-col items-start justify-end p-8 md:p-12 overflow-hidden"
                 >
@@ -57,7 +145,7 @@ export function Preloader() {
                             <span className="text-primary">▸</span> TERMINAL_SESSION_STARTED
                         </div>
 
-                        {lines.map((line, index) => (
+                        {visibleLines.map((line, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, x: -10 }}
@@ -84,7 +172,7 @@ export function Preloader() {
                         <motion.div
                             className="h-full bg-primary"
                             initial={{ width: "0%" }}
-                            animate={{ width: `${(lines.length / BOOT_SEQUENCE.length) * 100}%` }}
+                            animate={{ width: `${visualProgressWidth}%` }}
                             transition={{ ease: "linear", duration: 0.3 }}
                         />
                     </div>

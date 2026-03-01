@@ -52,4 +52,6 @@ pnpm format:check # Check formatting without applying changes
 - **Type Safety:** TypeScript is used throughout; ensure all new components and props are properly typed.
 
 ## Custom Directives
-- **External Tools:** Always use Context7 MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+- **Browser Automation:** Whenever I use the keyword "chrome", ALWAYS use the Chrome DevTools MCP tools (like `navigate_page`, `take_screenshot`, `evaluate_script`, `click`, etc.) to perform the requested actions or gather information directly from the browser instead of just looking at the codebase.
+- **Stitch Integration:** Whenever I use the keyword "stitch", ALWAYS use the Stitch MCP tools to perform the requested actions and use all the necessary tools to accomplish the task.
+- **Context7 Integration:** Whenever I use the keyword "context", ALWAYS use the Context7 MCP and all the tools that are needed to accomplish the task.

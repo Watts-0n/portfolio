@@ -110,29 +110,32 @@ export const skills = [
     },
 ];
 
-export const blogPosts = [
+export const experience = [
     {
-        title: "Optimizing React Render Cycles in High-Frequency Data Apps",
-        date: "Oct 12, 2024",
-        readTime: "5 min",
-        excerpt: "Deep dive into memoization strategies and custom hooks for handling 100+ updates per second.",
-        tags: ["React", "Performance"],
+        title: "Senior Full-Stack Engineer",
+        company: "Zippystarter",
+        date: "2023 — PRESENT",
+        readTime: "FULL_TIME",
+        excerpt: "Leading development of high-performance React templates and design systems. Architecting scalable frontend infrastructures using Next.js 15 and Tailwind CSS 4.",
+        tags: ["Next.js", "React", "TypeScript", "Node.js"],
         lineNum: "001",
     },
     {
-        title: "The State of WebAssembly in 2024",
-        date: "Sep 28, 2024",
-        readTime: "8 min",
-        excerpt: "Is WASM ready to replace JavaScript for heavy compute tasks? A performance benchmark.",
-        tags: ["WASM", "JavaScript"],
+        title: "Cloud Infrastructure Architect",
+        company: "NexGen Systems",
+        date: "2021 — 2023",
+        readTime: "CONTRACT",
+        excerpt: "Designed and implemented automated CI/CD pipelines and Kubernetes-based orchestration for microservices architectures. Reduced deployment latency by 45%.",
+        tags: ["AWS", "Docker", "K8s", "Go"],
         lineNum: "002",
     },
     {
-        title: "Building a Custom Kubernetes Operator with Go",
-        date: "Aug 15, 2024",
-        readTime: "12 min",
-        excerpt: "Automating stateful application management using the Operator pattern.",
-        tags: ["Go", "Kubernetes"],
+        title: "Software Engineer",
+        company: "Nebula Dashboard",
+        date: "2019 — 2021",
+        readTime: "FULL_TIME",
+        excerpt: "Developed real-time data visualization components and optimized backend query performance for a high-traffic analytics platform.",
+        tags: ["React", "Go", "PostgreSQL", "Redis"],
         lineNum: "003",
     },
 ];

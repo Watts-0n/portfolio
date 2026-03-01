@@ -43,7 +43,7 @@ export function HeroSection() {
                 <nav className="hidden md:flex gap-8 text-sm font-medium text-muted-foreground ">
                     <Link href="#projects" className="hover:text-primary transition-colors">Projects</Link>
                     <Link href="#skills" className="hover:text-primary transition-colors">Skills</Link>
-                    <Link href="#blog" className="hover:text-primary transition-colors">Logs</Link>
+                    <Link href="#experience" className="hover:text-primary transition-colors">Experience</Link>
                     <Link href="#contact" className="hover:text-primary transition-colors">Contact</Link>
                 </nav>
                 <Button

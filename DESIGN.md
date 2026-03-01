@@ -1,6 +1,4 @@
 # Design System: Dāvids Locāns Portfolio
-**Stitch Project ID:** `14179918346701536450`
-**Stitch Project Title:** Dāvids Locāns Portfolio — Engineering Terminal
 **Device Type:** Desktop-first (1280px canvas, responsive down to mobile)
 **Framework:** Next.js (App Router) + Tailwind CSS v4 + TypeScript
 
@@ -12,7 +10,7 @@ The portfolio embodies a **"Cyber-Industrial Engineering Terminal"** — a bruta
 
 The mood is **Stoic Modernism** — every element feels deliberate and engineered. Visual tension arises from contrasting elements: a hand-drawn sketch portrait colliding with pixel-perfect system metrics, massive whitespace against dense uppercase type, animated geometric particles drifting behind razor-sharp card borders.
 
-**Interactive layer:** A subtle triangle-pattern particle field (`PixelBlast`) floats across the entire page as a persistent background, with a fluid `SplashCursor` effect following pointer movement — adding life without compromising the clinical precision. The hero title uses a `DecryptedText` animation that sequentially reveals characters in a terminal-decode effect.
+**Interactive layer:** A subtle triangle-pattern particle field (`PixelBlast`) floats across the entire page as a persistent background. The hero title uses a `DecryptedText` animation that sequentially reveals characters in a terminal-decode effect.
 
 **Tone words:** Clinical, Precise, Engineered, Minimal, Technical, Authoritative, Systematic, Brutalist, Achromatic, Alive.
 
@@ -62,7 +60,7 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 ## 3. Typography Rules
 
 ### Font Families
-- **Sans-serif / Display:** **Space Grotesk** (`--font-sans: 'Space Grotesk', sans-serif`) — Used for headings (bold, 700 weight) and body text (regular, 400 weight). Loaded via `next/font/google`.
+- **Sans-serif / Display:** **Space Grotesk** (`--font-sans: 'Space Grotesk', sans-serif`) — Used for body text (regular, 400 weight). Loaded via `next/font/google`.
 - **Monospace / Technical UI:** **JetBrains Mono** (`--font-mono: 'JetBrains Mono', monospace`) — Used for navigation, button labels, tech badges, system metrics, form labels, footer links, and all "terminal" text. Also serves as the **display font family** for major headings.
 
 ### Typographic Utility Classes
@@ -75,7 +73,7 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 - **Navigation links** (`PROJECTS`, `SKILLS`, `LOGS`, `CONTACT`): `text-sm font-medium`, muted foreground, uppercase, wide tracking.
 - **Brand wordmark** (`Dāvids_Locāns`): `font-mono text-xl font-bold tracking-tighter` — underscore separator, primary-colored blinking cursor.
 - **Resume button** (`resume_v4.pdf`): `font-mono text-xs` — lowercase underscore notation, styled as a file reference.
-- **Tech badges** (`React`, `WebSocket`): `font-mono text-xs` in `<Badge>` components.
+- **Tech badges** (`React`, `WebSocket`): `font-mono text-xs` in `<Badge>` components or simple borders.
 - **Body text**: `text-base` or `md:text-xl`, Space Grotesk Regular, `text-muted-foreground`, `max-w-md`, relaxed line-height.
 - **System metrics labels** (`CPU_LOAD`, `GPU_LOAD`, `RAM`, `MEMORY`): `font-mono text-xs text-muted-foreground`, tabular numbers for value alignment.
 - **Code/terminal comments:** Prefixed with `//` — used for inline section labels (`// CORE ATTRIBUTES`, `// NEW_MESSAGE.init()`, `// TOOLS & STACK`). Always `font-mono text-xs text-muted-foreground`.
@@ -108,12 +106,12 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 - **Content:** Split layout — metrics bars on left, portrait image on right
 - **Progress bars:** `h-1` track with `bg-primary/20` base, animated `bg-primary` fill with `transition-all duration-700`
 - **Metrics:** CPU_LOAD, GPU_LOAD, RAM, MEMORY — values animate randomly every 1.8s
-- **Footer stat:** Project count as `text-4xl font-bold` number (zero-padded: "05") with "PROJECTS" label below
+- **Footer stat:** Project count as `text-4xl font-bold` number (zero-padded: "10") with "PROJECTS" label below
 - **All text:** `font-mono text-xs text-muted-foreground`, `tabular-nums` for number alignment
 
 ### Project Cards — Featured (First Project)
 - **Layout:** Full-width two-column split (`md:grid-cols-[1fr_1fr]`), minimum height `360px`
-- **Image side:** `overflow-hidden`, image scales to `105%` on `group-hover` (`transition-transform duration-700`), primary-tinted overlay on hover (`bg-primary/10`)
+- **Image side:** `overflow-hidden`, image wrapped in `TiltedCard` for 3D rotation, scales to `102%` on `group-hover`, primary-tinted overlay on hover (`bg-primary/10`)
 - **Content side:** `p-8`, flex column layout, `justify-between`
 - **Ghost index number:** Absolute-positioned in top-right corner — `text-[80px] font-bold text-border` (very faint), `select-none pointer-events-none`. Acts as decorative layer.
 - **Status badge:** `◉ LIVE / WIP / ARCHIVED` — `font-mono text-[10px] tracking-widest`, colored by state
@@ -121,17 +119,19 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 - **Title:** `text-3xl md:text-4xl font-display`, primary on `group-hover`
 - **Actions:** `LIVE DEMO` & `SOURCE` with `ArrowUpRight` / `Github` icons — micro-translate on hover
 
-### Project Cards — Grid (Remaining Projects)
-- **Container:** Zero-radius (`rounded-none`), no outer gaps — cards sit flush in a `border border-border` wrapper grid
-- **Grid:** `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4` — 4 columns on desktop, internal `border-r border-b` dividers (CSS borders, no gap)
-- **Image strip:** Fixed height `h-40`, `overflow-hidden`, gradient fade `from-card to-transparent` from bottom
-- **Index overlay:** `font-mono text-xs text-muted-foreground` bottom-left in image area, zero-padded (`02`–`05`)
-- **Content area:** `p-4`, shows status badge, year, title, 2-line clamped description, truncated tags
-- **Tag truncation:** Show max 2 tags + `+N` overflow badge
-- **Actions:** Tiny `font-mono text-[9px]` links (`DEMO`, `CODE`) separated by `border-t border-border`
+### Project Cards — Bento Grid (Remaining Projects)
+- **Layout:** Adaptive bento grid system (`grid-cols-1 md:grid-cols-12 gap-4`). Renders in blocks of 4 cards per row:
+  - **Wide Card:** `md:col-span-5`, `h-48` image area.
+  - **Mid Cards:** Two stacked cards in a `md:col-span-4 grid grid-rows-2 gap-4`, `h-32` image area.
+  - **Dark Card:** `md:col-span-3`, inverted colors (`bg-foreground` / `dark:bg-card`), dark overlay (`opacity-35`), min-height `200px`.
+- **Container:** `GlassPanel` components with `border border-border` and hover state `hover:border-primary/50`.
+- **Index overlay:** Absolute positioned top-right in image area, zero-padded large numbers (e.g., `text-[36px]` or `text-[28px]`), `text-border/60` or `text-white/10` for dark cards.
+- **Content area:** Flexible padding, shows status badge (`◉ LIVE`), year, title, description, and tags (sliced to max 3 on dark cards).
+- **Actions:** Tiny `font-mono text-[9px]` links (`DEMO`, `CODE`) with icon (`ExternalLink`, `Github`) above a `border-t` divider.
+- **Load More CTA:** Mono button, "LOAD ALL PROJECTS [ +N MORE ]" centered at bottom, border styling, toggles all projects visibility.
 
 ### Skills Section
-- **Background:** `bg-secondary/10` tinted surface band
+- **Background:** `bg-secondary/5` tinted surface band with top border
 - **Layout:** 12-column grid — 8 cols for skill groups with bars, 4 cols for attribute tiles + tools
 - **Category headers:** `font-display text-sm tracking-widest uppercase` with category icon (`Code2`, `Database`, `Terminal`) and `border-b border-primary/30` underline
 - **Skill bars (`SkillBar` component):**
@@ -142,14 +142,19 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
   - **Corner accent on hover:** absolute `w-4 h-[2px]` and `w-[2px] h-4` at top-left — primary color, fades in with `group-hover`
 - **Tools tag row:** Flat inline tags — `font-mono text-[9px] px-2 py-1 border border-border hover:border-primary hover:text-primary` — no background, just border outline
 
+### Logo Loop / Tech Marquee
+- **Positioning:** Lives below Skills section and above Transmissions section.
+- **Layout:** `py-12 border-t border-b border-border backdrop-blur-[3px] shadow-lg` wrapper
+- **Content:** Monospace tech names (e.g. `React`, `Docker`, `PostgreSQL`) paired with Lucide icons (`font-mono text-xs text-muted-foreground hover:text-primary`). Uses the `LogoLoop` component scrolling at `speed={80}`.
+
 ### Blog / Transmissions Section
-- **Container:** Single `border border-border` wrapper — the entire list lives inside one bordered box
+- **Container:** Single `border border-border` wrapper inside a `GlassPanel`
 - **Terminal bar header:**
   - Three colored dots: `w-2.5 h-2.5 rounded-full` in `bg-red-400/60`, `bg-yellow-400/60`, `bg-green-400/60`
   - Path label: `font-mono text-xs text-muted-foreground` — `~/logs/transmissions`
   - Background: `bg-card`, separated by `border-b border-border`
 - **Post row layout:** `grid md:grid-cols-[60px_1fr_auto]` — line number column | content | metadata column
-- **Line number column:** `font-mono text-xs text-muted-foreground/40`, `border-r border-border`, `flex items-center justify-center`
+- **Line number column:** `font-mono text-xs text-muted-foreground/60`, `border-r border-border`, `flex items-center justify-center`
 - **Content area:** `p-6` — topic tags (outlined, `border border-primary/30 text-primary font-mono text-[9px]`), title `text-xl md:text-2xl font-display`, excerpt `text-sm text-muted-foreground`
 - **Metadata column:** `border-l border-border min-w-[120px]` — date, read time with `Clock` icon, `ArrowUpRight` arrow that micro-translates on `group-hover`
 - **Row hover:** `hover:bg-card transition-colors duration-200`
@@ -158,7 +163,7 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 ### Contact Section
 - **Layout:** Two-column grid (`md:grid-cols-2 gap-16`) — info/labels left, form right
 - **Left column:**
-  - Section label (`▸ SECTION 04`), large heading, primary accent bar
+  - Section label (`▸ SECTION 04`), large heading
   - Description paragraph (`max-w-xs`)
   - **Contact method list:** Each entry — `w-8 h-8 border border-border` icon box + label/value stack. Icon box and value both transition to `text-primary border-primary` on `group-hover`
 - **Right column (form wrapper):**
@@ -175,7 +180,7 @@ The system operates in **dual mode** (light/dark) using CSS custom properties wi
 | **Outline / Ghost** | Transparent / `bg-accent` on hover | `text-foreground` | `border-input` | Same radius |
 | **Secondary** | `bg-secondary` | `text-secondary-foreground` | None | Same radius |
 
-> Forms use `rounded-none` inputs/buttons for a sharper, terminal-appropriate feel — overriding the default radius.
+> Forms use `rounded-none` inputs/buttons for a sharper, terminal-appropriate feel.
 
 ### Section Dividers
 - Single 1px `border-border` — purely structural, full-width
@@ -196,16 +201,15 @@ Section subtitle/description aligns right on desktop (`hidden md:block text-righ
 
 ### Grid & Spacing
 - **Container:** Centered `max-w-7xl` (1280px) with safe-area padding (`--safe-area-left/right`, defaults to `1rem`, `2rem` at 1024px+)
-- **Section rhythm:** Consistent `py-24` (96px top/bottom padding) per section — massive breathing room
-- **Featured project:** Full-width `border border-border`, no outer margins
-- **Project grid:** Zero-gap internal grid with CSS border dividers — cards share borders to form a unified panel
+- **Section rhythm:** Consistent `py-24` (96px top/bottom padding) per section
+- **Project grid:** The `bento grid` features an adaptive `grid-cols-1 md:grid-cols-12` layout allowing varying card widths for an asymmetrical architectural look.
 - **Skill grid gaps:** 48px between major sections (`gap-8`), 20px between sub-items (`space-y-5`)
 - **Contact grid gap:** `gap-16` between the two columns
 
 ### Background System
 Three visual layers composited (back to front):
-1. **PixelBlast canvas** — Fullscreen triangle-variant particle field in `#c0c0c0`, pattern scale 10, density 0.2, moving at 0.5 speed. Creates a living, geometric texture.
-2. **Section backgrounds** — Some sections add `bg-secondary/10` or `bg-card/50` tinted bands to create depth
+1. **PixelBlast canvas** — Fullscreen triangle-variant particle field in `#c0c0c0`, pattern scale 50, density 0.3, moving at 0.5 speed. Creates a living, geometric texture.
+2. **Section backgrounds** — Some sections add `bg-secondary/5` or `bg-card/50` tinted bands or glass panels to create depth
 3. **Content** — Uses `relative z-10` to float above the background particles
 
 ### Alignment
@@ -213,7 +217,6 @@ Three visual layers composited (back to front):
 - Section subtitles: **Right-aligned** (desktop only, `hidden md:block`) — creates typographic tension
 - Contact section: **Two-column split** (exception — info left, form right)
 - Footer: `flex-row justify-between` with brand + copyright left, social links right
-- Body text: Left-aligned with `max-w-xs` or `max-w-sm` natural line length constraints
 
 ### Whitespace Philosophy
 Whitespace **is** the design. The triangle particle background transforms empty space from "blank" to "alive" — it becomes structural, intentional, and dynamic. Sections breathe with 96px padding; grids use disciplined spacing. The result feels engineered, not sparse.
@@ -230,7 +233,7 @@ Whitespace **is** the design. The triangle particle background transforms empty 
 
 ### Image Hover Effects
 - All project images: `group-hover:scale-105 transition-transform duration-700` — subtle zoom
-- Featured project: Additional `bg-primary/10 opacity-0 group-hover:opacity-100` tint overlay
+- Featured project: Uses `TiltedCard` 3D rotation, plus `bg-primary/10 opacity-0 group-hover:opacity-100` tint overlay
 
 ### Corner Bracket Hover (Attribute Tiles)
 - On hover: two 1px lines appear at top-left corner (`w-4 h-[2px]` + `w-[2px] h-4`) in `bg-primary`
@@ -242,7 +245,7 @@ Whitespace **is** the design. The triangle particle background transforms empty 
 
 ### Row Highlights
 - Blog post rows: `hover:bg-card transition-colors duration-200`
-- Project grid cells: `hover:bg-card transition-colors duration-300`
+- Project grid cells: `hover:border-primary/50 transition-all duration-500`
 
 ---
 
@@ -282,7 +285,7 @@ DESIGN SYSTEM (REQUIRED):
 - COMPONENTS:
   - Buttons: Rounded-md (~0.5rem radius) default; rounded-none inside forms for terminal feel
   - Cards (featured): Full-width two-column split, ghost index number (text-[80px] text-border), status badge
-  - Cards (grid): Zero-gap flush grid with CSS border dividers, image strip + compact content
+  - Cards (grid): Adaptive Bento Grid (md:grid-cols-12), Wide, Mid, Dark cards, top-right ghost index (text-[36px]/[28px])
   - Inputs: rounded-none, 1px border, no shadow, ALLCAPS mono labels above
   - Status panels: CSS corner-bracket decoration (L-shaped borders at corners), backdrop-blur
   - Progress bars: h-[2px] thin tracks with animated fill (IntersectionObserver trigger), mono labels
@@ -293,15 +296,16 @@ DESIGN SYSTEM (REQUIRED):
   - max-w-7xl container, py-24 section spacing
   - Section headers: left-aligned heading + right-aligned subtitle (desktop only)
   - Consistent "▸ SECTION 0N" label above every section heading
-  - Project layout: 1 featured full-width + N-column flush grid below
+  - Project layout: 1 featured full-width + Bento Grid configuration
 - EFFECTS:
   - DecryptedText animation (terminal decode) on hero heading
-  - SplashCursor fluid effect following mouse
+  - PixelBlast background effect (triangles, #c0c0c0)
+  - LogoLoop scrolling marquee below skills section
   - Animated metric bars (CPU/GPU/RAM) with random fluctuation in status panel
   - Animated skill bars (width 0→target%, eased, stagger by group+index, scroll-triggered)
   - Frosted glass nav bar (backdrop-blur-md, bg-background/80)
-  - Image zoom on hover (scale-105, 700ms)
+  - Image zoom on hover (scale-105, 700ms) and TiltedCard 3D rotation
   - Corner accent micro-lines on attribute tile hover
   - Arrow icon micro-translate on link hover (diagonal exit motion)
-- STYLE KEYWORDS: Engineering Terminal, Brutalist-Tech, System Dashboard, Monospace, Blueprint, Achromatic (light), Electrified (dark), Clinical, Precise
+- STYLE KEYWORDS: Engineering Terminal, Brutalist-Tech, System Dashboard, Bento Grid, Monospace, Blueprint, Achromatic (light), Electrified (dark), Clinical, Precise
 ```

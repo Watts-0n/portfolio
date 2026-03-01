@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Container } from "@/components/zippystarter/container";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { SkillBar } from "@/components/ui/skill-bar";
-import { skills, blogPosts } from "@/lib/data";
+import { skills, experience } from "@/lib/data";
 import { ChevronRight, ArrowUpRight, Clock, Code2, Database, Cpu, Terminal, Braces, Layers, Server, Container as ContainerIcon, Boxes, Globe, Palette, Workflow, GitBranch, MonitorSmartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LogoLoop from "@/components/ui/LogoLoop";
@@ -144,10 +144,10 @@ export default function Home() {
       </Container>
 
       {/* ═══════════════════════════════════════════
-          BLOG / TRANSMISSIONS - REDESIGNED
+          WORK_EXPERIENCE - REDESIGNED
       ═══════════════════════════════════════════ */}
       <Container
-        id="blog"
+        id="experience"
         component="section"
         wrapperClassName="relative z-10 py-24 border-t border-border"
         className="max-w-7xl mx-auto"
@@ -159,12 +159,12 @@ export default function Home() {
               <span className="text-primary">▸</span> SECTION 03
             </div>
             <h2 className="text-4xl md:text-6xl font-display tracking-tighter mb-4">
-              TRANSMISSIONS
+              WORK_EXPERIENCE
             </h2>
             <div className="h-[2px] w-24 bg-primary" />
           </div>
           <Button variant="outline" className="font-mono text-xs hidden md:flex items-center gap-2 border-primary/30 hover:border-primary hover:text-primary">
-            VIEW ALL <ChevronRight className="size-3" />
+            VIEW_FULL_CV <ChevronRight className="size-3" />
           </Button>
         </div>
 
@@ -177,48 +177,47 @@ export default function Home() {
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
               <div className="w-2.5 h-2.5 rounded-full bg-green-400/60" />
             </div>
-            <span className="font-mono text-xs text-muted-foreground ml-2">~/logs/transmissions</span>
+            <span className="font-mono text-xs text-muted-foreground ml-2">~/logs/work_experience</span>
           </div>
 
-          {/* Posts */}
-          {blogPosts.map((post, index) => (
-            <Link href="#" key={index} className="group block">
+          {/* Projects */}
+          {experience.map((item, index) => (
+            <div key={index} className="group block">
               <div className="grid md:grid-cols-[60px_1fr_auto] items-stretch border-b border-border last:border-b-0 hover:bg-card transition-colors duration-200">
                 {/* Line number */}
                 <div className="font-mono text-xs text-muted-foreground/60 border-r border-border flex items-center justify-center p-4 select-none">
-                  {post.lineNum}
+                  {item.lineNum}
                 </div>
                 {/* Content */}
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    {post.tags.map((tag) => (
+                    {item.tags.map((tag) => (
                       <span key={tag} className="font-mono text-[9px] px-1.5 py-0.5 border border-primary/30 text-primary">
                         {tag}
                       </span>
                     ))}
                   </div>
                   <h3 className="text-xl md:text-2xl font-display group-hover:text-primary transition-colors mb-2 text-balance leading-tight">
-                    {post.title}
+                    {item.title} <span className="text-primary/50 text-base md:text-lg">@ {item.company}</span>
                   </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed max-w-2xl">
-                    {post.excerpt}
+                    {item.excerpt}
                   </p>
                 </div>
                 {/* Metadata */}
                 <div className="border-l border-border flex flex-col justify-center items-end gap-2 p-4 md:p-6 min-w-[120px]">
-                  <span className="font-mono text-[9px] text-muted-foreground whitespace-nowrap">{post.date}</span>
-                  <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                    <Clock className="size-2.5" /> {post.readTime}
+                  <span className="font-mono text-[9px] text-muted-foreground whitespace-nowrap">{item.date}</span>
+                  <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground uppercase">
+                    <div className="size-1.5 rounded-full bg-primary" /> {item.readTime}
                   </div>
-                  <ArrowUpRight className="size-3 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mt-2" />
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </GlassPanel>
 
         <div className="text-center mt-8 md:hidden">
-          <Button variant="outline" className="font-mono text-xs">VIEW ALL TRANSMISSIONS</Button>
+          <Button variant="outline" className="font-mono text-xs">VIEW FULL CV</Button>
         </div>
       </Container>
 
@@ -241,6 +240,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex gap-6 text-xs font-mono text-muted-foreground">
+            <Link href="#projects" className="hover:text-primary transition-colors">Projects</Link>
+            <Link href="#skills" className="hover:text-primary transition-colors">Skills</Link>
+            <Link href="#experience" className="hover:text-primary transition-colors">Experience</Link>
+            <Link href="#contact" className="hover:text-primary transition-colors">Contact</Link>
             <Link href="#" className="hover:text-primary transition-colors">GITHUB</Link>
             <Link href="#" className="hover:text-primary transition-colors">LINKEDIN</Link>
             <Link href="#" className="hover:text-primary transition-colors">TWITTER</Link>

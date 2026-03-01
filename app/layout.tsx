@@ -23,7 +23,7 @@ const siteUrl =
     ? `https://${process.env.VERCEL_BRANCH_URL}`
     : process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "http://localhost:3000";
+      : "http://localhost:3002";
 
 const title = "Dev Starter by Zippystarter";
 const description =
@@ -50,7 +50,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="scroll-smooth shadcn">
       <body
-        className={`font-body antialiased overflow-x-hidden ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
+        className={`font-body w-screen antialiased overflow-x-hidden ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
         <Preloader />
         <SplashCursor />

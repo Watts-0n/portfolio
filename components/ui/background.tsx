@@ -220,12 +220,22 @@ uniform float uClickTimes[MAX_CLICKS];
 
 out vec4 fragColor;
 
-float Bayer2(vec2 a) {
-  a = floor(a);
-  return fract(a.x / 2. + a.y * a.y * .75);
+// 8x8 Bayer matrix for stable, square dither tiling
+const float BAYER_8x8[64] = float[64](
+    0./64., 48./64., 12./64., 60./64.,  3./64., 51./64., 15./64., 63./64.,
+    32./64., 16./64., 44./64., 28./64., 35./64., 19./64., 47./64., 31./64.,
+    8./64., 56./64.,  4./64., 52./64., 11./64., 59./64.,  7./64., 55./64.,
+    40./64., 24./64., 36./64., 20./64., 43./64., 27./64., 39./64., 23./64.,
+    2./64., 50./64., 14./64., 62./64.,  1./64., 49./64., 13./64., 61./64.,
+    34./64., 18./64., 46./64., 30./64., 33./64., 17./64., 45./64., 29./64.,
+    10./64., 58./64.,  6./64., 54./64.,  9./64., 57./64.,  5./64., 53./64.,
+    42./64., 26./64., 38./64., 22./64., 41./64., 25./64., 37./64., 21./64.
+);
+
+float bayer8(vec2 p) {
+    ivec2 i = ivec2(mod(p, 8.0));
+    return BAYER_8x8[i.y * 8 + i.x];
 }
-#define Bayer4(a) (Bayer2(.5*(a))*0.25 + Bayer2(a))
-#define Bayer8(a) (Bayer4(.5*(a))*0.25 + Bayer2(a))
 
 #define FBM_OCTAVES     5
 #define FBM_LACUNARITY  1.25
@@ -303,10 +313,10 @@ void main(){
   vec2 cellId = floor(fragCoord / cellPixelSize);
   vec2 cellCoord = cellId * cellPixelSize;
   
-  // Robust aspect ratio compensation: normalize by the minimum dimension 
-  // to prevent pattern stretching on portrait/mobile screens.
-  float minRes = min(uResolution.x, uResolution.y);
-  vec2 uv = cellCoord / minRes;
+  // Use a fixed reference size (1000px) instead of the fluctuating 
+  // viewport resolution to ensure the pattern is perfectly square 
+  // regardless of device orientation or screen dimensions.
+  vec2 uv = cellCoord / 1000.0;
 
   float base = fbm2(uv, uTime * 0.05);
   base = base * 0.5 - 0.65;
@@ -323,8 +333,7 @@ void main(){
       vec2 pos = uClickPos[i];
       if (pos.x < 0.0) continue;
       float cellPixelSize = 8.0 * pixelSize;
-      float minRes = min(uResolution.x, uResolution.y);
-      vec2 cuv = (pos - uResolution * .5 - cellPixelSize * .5) / minRes;
+      vec2 cuv = (pos - uResolution * .5 - cellPixelSize * .5) / 1000.0;
       float t = max(uTime - uClickTimes[i], 0.0);
       float r = distance(uv, cuv);
       float waveR = speed * t;
@@ -334,7 +343,7 @@ void main(){
     }
   }
 
-  float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
+  float bayer = bayer8(fragCoord / uPixelSize) - 0.5;
   float bw = step(0.5, feed + bayer);
 
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);

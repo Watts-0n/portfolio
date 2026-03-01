@@ -1,91 +1,117 @@
 "use client";
 
-import type { SpringOptions } from 'motion/react';
-import { useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring } from 'motion/react';
+import { memo, useCallback, useRef } from "react";
+import { motion, useMotionValue, useSpring, type SpringOptions } from "motion/react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface TiltedCardProps {
     children?: React.ReactNode;
-    containerHeight?: React.CSSProperties['height'];
-    containerWidth?: React.CSSProperties['width'];
+    containerHeight?: React.CSSProperties["height"];
+    containerWidth?: React.CSSProperties["width"];
     scaleOnHover?: number;
     rotateAmplitude?: number;
     showMobileWarning?: boolean;
     className?: string;
+    springOptions?: SpringOptions;
 }
 
-const springValues: SpringOptions = {
-    damping: 30,
-    stiffness: 100,
-    mass: 2
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+// High stiffness + low mass = snappy response with no initial lag
+const DEFAULT_SPRING: SpringOptions = {
+    damping: 20,
+    stiffness: 300,
+    mass: 0.5,
 };
 
-export default function TiltedCard({
+const FIGURE_BASE_CLASS =
+    "relative w-full h-full [perspective:800px] flex flex-col items-center justify-center";
+
+const MOTION_DIV_CLASS =
+    "relative [transform-style:preserve-3d] w-full h-full";
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+function TiltedCard({
     children,
-    containerHeight = '300px',
-    containerWidth = '100%',
+    containerHeight = "300px",
+    containerWidth = "100%",
     scaleOnHover = 1.05,
-    rotateAmplitude = 10,
+    rotateAmplitude = 14,
     showMobileWarning = false,
-    className = '',
+    className = "",
+    springOptions = DEFAULT_SPRING,
 }: TiltedCardProps) {
     const ref = useRef<HTMLElement>(null);
-    const rotateX = useSpring(useMotionValue(0), springValues);
-    const rotateY = useSpring(useMotionValue(0), springValues);
-    const scale = useSpring(1, springValues);
 
-    function handleMouse(e: React.MouseEvent<HTMLElement>) {
-        if (!ref.current) return;
+    // Cache the bounding rect so getBoundingClientRect() is only called
+    // once per hover session (on enter), not on every mousemove frame.
+    const rectCache = useRef<{ left: number; top: number; halfW: number; halfH: number } | null>(null);
 
-        const rect = ref.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left - rect.width / 2;
-        const offsetY = e.clientY - rect.top - rect.height / 2;
+    // Plain motion values fed into springs — no chaining useMotionValue inside useSpring
+    const rotateXRaw = useMotionValue(0);
+    const rotateYRaw = useMotionValue(0);
+    const scaleRaw = useMotionValue(1);
 
-        const rotationX = (offsetY / (rect.height / 2)) * -rotateAmplitude;
-        const rotationY = (offsetX / (rect.width / 2)) * rotateAmplitude;
+    const rotateX = useSpring(rotateXRaw, springOptions);
+    const rotateY = useSpring(rotateYRaw, springOptions);
+    const scale = useSpring(scaleRaw, springOptions);
 
-        rotateX.set(rotationX);
-        rotateY.set(rotationY);
-    }
+    // ── Handlers ──────────────────────────────────────────────────────────────
 
-    function handleMouseEnter() {
-        scale.set(scaleOnHover);
-    }
+    const handleMouseEnter = useCallback(() => {
+        const el = ref.current;
+        if (!el) return;
+        // Cache rect once — avoids forced layout reflow on every mousemove
+        const { left, top, width, height } = el.getBoundingClientRect();
+        rectCache.current = { left, top, halfW: width / 2, halfH: height / 2 };
+        scaleRaw.set(scaleOnHover);
+    }, [scaleRaw, scaleOnHover]);
 
-    function handleMouseLeave() {
-        scale.set(1);
-        rotateX.set(0);
-        rotateY.set(0);
-    }
+    const handleMouseMove = useCallback(
+        (e: React.MouseEvent<HTMLElement>) => {
+            const r = rectCache.current;
+            if (!r) return;
+            rotateXRaw.set(((e.clientY - r.top - r.halfH) / r.halfH) * -rotateAmplitude);
+            rotateYRaw.set(((e.clientX - r.left - r.halfW) / r.halfW) * rotateAmplitude);
+        },
+        [rotateAmplitude, rotateXRaw, rotateYRaw]
+    );
+
+    const handleMouseLeave = useCallback(() => {
+        rectCache.current = null;
+        scaleRaw.set(1);
+        rotateXRaw.set(0);
+        rotateYRaw.set(0);
+    }, [scaleRaw, rotateXRaw, rotateYRaw]);
+
+    // ── Render ─────────────────────────────────────────────────────────────────
 
     return (
         <figure
             ref={ref}
-            className={`relative w-full h-full [perspective:800px] flex flex-col items-center justify-center ${className}`}
-            style={{
-                height: containerHeight,
-                width: containerWidth
-            }}
-            onMouseMove={handleMouse}
+            className={`${FIGURE_BASE_CLASS}${className ? ` ${className}` : ""}`}
+            style={{ height: containerHeight, width: containerWidth }}
+            onMouseMove={handleMouseMove}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            role="presentation"
         >
             {showMobileWarning && (
-                <div className="absolute top-4 text-center text-sm block sm:hidden">
+                <p className="absolute top-4 text-center text-sm block sm:hidden select-none pointer-events-none">
                     This effect is not optimized for mobile. Check on desktop.
-                </div>
+                </p>
             )}
 
             <motion.div
-                className="relative [transform-style:preserve-3d] w-full h-full"
-                style={{
-                    rotateX,
-                    rotateY,
-                    scale
-                }}
+                className={MOTION_DIV_CLASS}
+                style={{ rotateX, rotateY, scale, willChange: "transform" }}
             >
                 {children}
             </motion.div>
         </figure>
     );
 }
+
+export default memo(TiltedCard);

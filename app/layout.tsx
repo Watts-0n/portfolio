@@ -5,6 +5,8 @@ import "./globals.css";
 import SplashCursor from "@/components/ui/SplashCursor";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import { Preloader } from "@/components/ui/preloader";
+import { PageReveal } from "@/components/ui/page-reveal";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -50,9 +52,12 @@ export default function RootLayout({
       <body
         className={`font-body antialiased overflow-x-hidden ${spaceGrotesk.variable} ${jetBrainsMono.variable}`}
       >
+        <Preloader />
         <SplashCursor />
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {children}
+          <PageReveal>
+            {children}
+          </PageReveal>
         </ThemeProvider>
         <SpeedInsights />
         <Analytics />

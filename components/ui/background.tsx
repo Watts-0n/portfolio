@@ -206,6 +206,7 @@ uniform float uRippleSpeed;
 uniform float uRippleThickness;
 uniform float uRippleIntensity;
 uniform float uEdgeFade;
+uniform float uPixelRatio;
 
 uniform int   uShapeType;
 const int SHAPE_SQUARE   = 0;
@@ -313,10 +314,11 @@ void main(){
   vec2 cellId = floor(fragCoord / cellPixelSize);
   vec2 cellCoord = cellId * cellPixelSize;
   
-  // Use a fixed reference size (1000px) instead of the fluctuating 
-  // viewport resolution to ensure the pattern is perfectly square 
-  // regardless of device orientation or screen dimensions.
-  vec2 uv = cellCoord / 1000.0;
+  // Normalize to CSS-pixel space before computing UVs so the pattern
+  // density is identical regardless of device pixel ratio (DPR).
+  // Without this, high-DPR mobile screens stretch the pattern because
+  // gl_FragCoord is in physical pixels which are 2-3x larger.
+  vec2 uv = (cellCoord / uPixelRatio) / 1000.0;
 
   float base = fbm2(uv, uTime * 0.05);
   base = base * 0.5 - 0.65;
@@ -333,7 +335,7 @@ void main(){
       vec2 pos = uClickPos[i];
       if (pos.x < 0.0) continue;
       float cellPixelSize = 8.0 * pixelSize;
-      vec2 cuv = (pos - uResolution * .5 - cellPixelSize * .5) / 1000.0;
+      vec2 cuv = ((pos - uResolution * .5 - cellPixelSize * .5) / uPixelRatio) / 1000.0;
       float t = max(uTime - uClickTimes[i], 0.0);
       float r = distance(uv, cuv);
       float waveR = speed * t;
@@ -428,6 +430,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             uRippleThickness: { value: number };
             uRippleIntensity: { value: number };
             uEdgeFade: { value: number };
+            uPixelRatio: { value: number };
         };
         resizeObserver?: ResizeObserver;
         raf?: number;
@@ -508,7 +511,8 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uRippleSpeed: { value: rippleSpeed },
                 uRippleThickness: { value: rippleThickness },
                 uRippleIntensity: { value: rippleIntensityScale },
-                uEdgeFade: { value: edgeFade }
+                uEdgeFade: { value: edgeFade },
+                uPixelRatio: { value: renderer.getPixelRatio() }
             };
             const scene = new THREE.Scene();
             const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -534,6 +538,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 if (threeRef.current?.composer)
                     threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
                 uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
+                uniforms.uPixelRatio.value = renderer.getPixelRatio();
             };
             setSize();
             const ro = new ResizeObserver(() => {

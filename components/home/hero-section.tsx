@@ -60,8 +60,8 @@ export function HeroSection() {
                 className="mx-auto max-w-7xl flex-1"
             >
                 {/* Background Image with Overlay */}
-                <div className="fixed w-screen h-screen inset-0 z-0">
-                    <div className="relative w-screen h-screen bg-background overflow-hidden">
+                <div className="fixed w-screen h-dvh inset-0 z-0">
+                    <div className="relative w-screen h-dvh bg-background overflow-hidden">
                         <div className="animate-hero-breathe absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/hero-bg.jpg')] before:absolute before:inset-0 before:bg-primary before:mix-blend-color-dodge dark:before:mix-blend-color" />
                     </div>
                     <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/50 to-background" />

@@ -439,6 +439,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         composer?: EffectComposer;
         touch?: ReturnType<typeof createTouchTexture>;
         liquidEffect?: Effect;
+        viewportResizeHandler?: () => void;
     } | null>(null);
     const prevConfigRef = useRef<ReinitConfig | null>(null);
     useEffect(() => {
@@ -488,8 +489,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 console.warn('PixelBlast: Failed to create WebGL renderer.', e);
                 return;
             }
-            renderer.domElement.style.width = '100%';
-            renderer.domElement.style.height = '100%';
+            renderer.domElement.style.display = 'block';
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
             container.appendChild(renderer.domElement);
             if (transparent) renderer.setClearAlpha(0);
@@ -529,11 +529,17 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             const quad = new THREE.Mesh(quadGeom, material);
             scene.add(quad);
             const clock = new THREE.Clock();
-            let resizeTimer: ReturnType<typeof setTimeout> | null = null;
             const setSize = () => {
                 const w = container.clientWidth || 1;
                 const h = container.clientHeight || 1;
-                renderer.setSize(w, h, false);
+                // Use `true` (default) for updateStyle so Three.js sets both
+                // the canvas drawing-buffer AND its CSS width/height in px.
+                // Previously `false` was used, which left CSS at 100%/100%.
+                // On mobile, the CSS container can grow taller when the browser
+                // toolbar hides, but the buffer stayed at the old size — the
+                // browser then *stretched* the smaller buffer to fill the
+                // larger CSS box, causing vertical distortion.
+                renderer.setSize(w, h);
                 uniforms.uResolution.value.set(renderer.domElement.width, renderer.domElement.height);
                 if (threeRef.current?.composer)
                     threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
@@ -541,11 +547,24 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uniforms.uPixelRatio.value = renderer.getPixelRatio();
             };
             setSize();
-            const ro = new ResizeObserver(() => {
-                if (resizeTimer) clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(setSize, 100);
-            });
+            // Use a rAF guard instead of setTimeout debounce so the canvas
+            // size is synced on the very next frame rather than after 100ms.
+            let resizeRafId: number | null = null;
+            const scheduleResize = () => {
+                if (resizeRafId !== null) return;
+                resizeRafId = requestAnimationFrame(() => {
+                    resizeRafId = null;
+                    setSize();
+                });
+            };
+            const ro = new ResizeObserver(scheduleResize);
             ro.observe(container);
+            // Mobile browsers change the visible area when the toolbar
+            // hides/shows. ResizeObserver on the container doesn't fire
+            // for this because the CSS layout doesn't change — only the
+            // visual viewport does. Listen for that separately.
+            const vv = window.visualViewport;
+            if (vv) vv.addEventListener('resize', scheduleResize);
             const randomFloat = (): number => {
                 if (typeof window !== 'undefined' && window.crypto?.getRandomValues) {
                     const u32 = new Uint32Array(1);
@@ -681,7 +700,8 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 timeOffset,
                 composer,
                 touch,
-                liquidEffect
+                liquidEffect,
+                viewportResizeHandler: scheduleResize
             };
         } else {
             const t = threeRef.current!;
@@ -713,6 +733,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             if (!threeRef.current) return;
             const t = threeRef.current;
             t.resizeObserver?.disconnect();
+            const vv = window.visualViewport;
+            if (vv && t.viewportResizeHandler) {
+                vv.removeEventListener('resize', t.viewportResizeHandler);
+            }
             cancelAnimationFrame(t.raf!);
             t.quad?.geometry.dispose();
             t.material.dispose();

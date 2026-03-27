@@ -14,16 +14,34 @@ const BOOT_SEQUENCE = [
     "SYSTEM_ONLINE.",
 ];
 
+const CACHE_KEY = "preloader_shown";
+
 export function Preloader() {
     const [activeIndex, setActiveIndex] = useState(-1);
     const [isComplete, setIsComplete] = useState(false);
     const [isVisible, setIsVisible] = useState(true);
     const [actualProgress, setActualProgress] = useState(0);
+    const [isCached, setIsCached] = useState(false);
+
+    // Check sessionStorage on mount — skip loader if already shown this session
+    useEffect(() => {
+        try {
+            if (sessionStorage.getItem(CACHE_KEY)) {
+                setIsCached(true);
+                setIsComplete(true);
+                setIsVisible(false);
+                globalLoadingState.setLoaded(true);
+            }
+        } catch {
+            // sessionStorage may be unavailable (e.g. SSR, incognito restrictions)
+        }
+    }, []);
 
     const visibleLines = BOOT_SEQUENCE.slice(0, activeIndex + 1);
 
     // Track actual page loading progress
     useEffect(() => {
+        if (isCached) return;
         let maxAssets = 0;
         let loadedAssets = 0;
 
@@ -87,9 +105,10 @@ export function Preloader() {
             window.removeEventListener("load", checkAssets);
             clearTimeout(timeout);
         };
-    }, []);
+    }, [isCached]);
 
     useEffect(() => {
+        if (isCached) return;
         let current = activeIndex === -1 ? 0 : activeIndex;
 
         const advanceSequence = () => {
@@ -108,6 +127,7 @@ export function Preloader() {
                 setTimeout(() => {
                     setIsComplete(true);
                     globalLoadingState.setLoaded(true);
+                    try { sessionStorage.setItem(CACHE_KEY, "1"); } catch {}
                     setTimeout(() => {
                         setIsVisible(false);
                     }, 1100); // Wait for exit animation (800ms) + small buffer
@@ -118,7 +138,7 @@ export function Preloader() {
         const interval = setInterval(advanceSequence, 150); // Faster delay between lines
 
         return () => clearInterval(interval);
-    }, [actualProgress, activeIndex]);
+    }, [actualProgress, activeIndex, isCached]);
 
     if (!isVisible) return null;
 

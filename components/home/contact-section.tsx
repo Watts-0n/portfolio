@@ -49,35 +49,35 @@ export function ContactSection() {
                 </div>
 
                 {/* Right side — form */}
-                <div className="relative">
+                <div className="relative bg-card/30">
                     {/* Corner brackets */}
                     <div className="absolute -top-3 -left-3 w-6 h-6 border-t-2 border-l-2 border-primary pointer-events-none" />
                     <div className="absolute -top-3 -right-3 w-6 h-6 border-t-2 border-r-2 border-primary pointer-events-none" />
                     <div className="absolute -bottom-3 -left-3 w-6 h-6 border-b-2 border-l-2 border-primary pointer-events-none" />
                     <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b-2 border-r-2 border-primary pointer-events-none" />
 
-                    <div className="p-8 border border-border bg-background">
+                    <div className="p-8 border border-border">
                         <div className="font-mono text-[10px] text-muted-foreground mb-6">// NEW_MESSAGE.init()</div>
                         <form className="grid gap-6">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
                                     <label htmlFor="name" className="text-xs font-mono text-muted-foreground tracking-widest">NAME</label>
-                                    <Input id="name" placeholder="John Doe" className="font-mono text-sm rounded-none border-border focus:border-primary" />
+                                    <Input id="name" placeholder="John Doe" className="font-mono text-sm rounded-none border-border focus:border-primary bg-card/70" />
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="email" className="text-xs font-mono text-muted-foreground tracking-widest">EMAIL</label>
-                                    <Input id="email" type="email" placeholder="john@example.com" className="font-mono text-sm rounded-none border-border focus:border-primary" />
+                                    <Input id="email" type="email" placeholder="john@example.com" className="font-mono text-sm rounded-none border-border focus:border-primary bg-card/70" />
                                 </div>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="subject" className="text-xs font-mono text-muted-foreground tracking-widest">SUBJECT</label>
-                                <Input id="subject" placeholder="Project inquiry / Collaboration / ..." className="font-mono text-sm rounded-none border-border focus:border-primary" />
+                                <Input id="subject" placeholder="Project inquiry / Collaboration / ..." className="font-mono text-sm rounded-none border-border focus:border-primary bg-card/70" />
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="message" className="text-xs font-mono text-muted-foreground tracking-widest">MESSAGE</label>
-                                <Textarea id="message" placeholder="Enter your transmission..." className="min-h-[140px] font-mono text-sm rounded-none border-border focus:border-primary resize-none" />
+                                <Textarea id="message" placeholder="Enter your transmission..." className="min-h-[140px] font-mono text-sm rounded-none border-border focus:border-primary resize-none bg-card/70" />
                             </div>
-                            <Button type="submit" className="w-full font-mono text-sm uppercase rounded-none hover:-translate-y-px transition-all duration-200" size="lg">
+                            <Button type="submit" className="w-full font-mono text-sm uppercase rounded-none" size="lg">
                                 SEND TRANSMISSION <ArrowRight className="ml-2 size-4" />
                             </Button>
                         </form>

@@ -31,6 +31,7 @@ type GlassPanelProps<T extends React.ElementType = "div"> = {
     children?: React.ReactNode;
     background?: string;
     inverted?: boolean;
+    opaque?: boolean;
 } & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className" | "children">;
 
 function GlassPanel<T extends React.ElementType = "div">({
@@ -42,16 +43,18 @@ function GlassPanel<T extends React.ElementType = "div">({
     background,
     children,
     inverted = false,
+    opaque = false,
     ...props
 }: GlassPanelProps<T>) {
     const Tag = (as ?? "div") as React.ElementType;
     const { size, t, b, l, r } = cornerMap[cornerSize];
-    const bgClass = background ? background : "bg-card/10";
+    const bgClass = background ? background : opaque ? "bg-card/80" : "bg-card/10";
 
     return (
         <Tag
             className={cn(
-                "relative border border-border/30 z-10 backdrop-blur-md",
+                "relative border border-border/30 z-10",
+                !opaque && "backdrop-blur-md",
                 shadowMap[shadow],
                 className,
                 bgClass

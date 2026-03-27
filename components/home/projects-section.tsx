@@ -22,7 +22,7 @@ const INITIAL_VISIBLE = 5;
 type Project = typeof projects[0];
 
 const WideCard = ({ p, idx }: { p: Project; idx: number }) => (
-    <GlassPanel background="bg-card/50" className="md:col-span-5 group relative overflow-hidden flex flex-col border border-border hover:border-primary/50 transition-all duration-500">
+    <GlassPanel opaque className="md:col-span-5 group relative overflow-hidden flex flex-col border border-border hover:border-primary/50 transition-all duration-500">
         <div className="relative overflow-hidden h-48 shrink-0">
             <ProjectImage src={p.image} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0" />
@@ -35,7 +35,7 @@ const WideCard = ({ p, idx }: { p: Project; idx: number }) => (
                 <span className={cn("font-mono text-[9px] tracking-widest", statusColor[p.status])}>◉ {p.status}</span>
                 <span className="font-mono text-[9px] text-muted-foreground">{p.year}</span>
             </div>
-            <h3 className="text-xl font-display group-hover:text-primary transition-colors leading-tight">{p.title}</h3>
+            <h3 className="text-xl font-display transition-colors leading-tight">{p.title}</h3>
             <p className="text-xs text-muted-foreground leading-relaxed flex-1">{p.description}</p>
             <div className="flex flex-wrap gap-1">
                 {p.tags.map((tag) => (
@@ -51,7 +51,7 @@ const WideCard = ({ p, idx }: { p: Project; idx: number }) => (
 );
 
 const MidCard = ({ p, idx }: { p: Project; idx: number }) => (
-    <GlassPanel background="bg-card/50" className="group relative overflow-hidden flex flex-col border border-border hover:border-primary/50 transition-all duration-500">
+    <GlassPanel opaque className="group relative overflow-hidden flex flex-col border border-border hover:border-primary/50 transition-all duration-500">
         <div className="relative overflow-hidden h-32 shrink-0">
             <ProjectImage src={p.image} alt={p.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
             <div className="absolute inset-0" />
@@ -64,7 +64,7 @@ const MidCard = ({ p, idx }: { p: Project; idx: number }) => (
                 <span className={cn("font-mono text-[9px] tracking-widest", statusColor[p.status])}>◉ {p.status}</span>
                 <span className="font-mono text-[9px] text-muted-foreground">{p.year}</span>
             </div>
-            <h3 className="text-base font-display group-hover:text-primary transition-colors">{p.title}</h3>
+            <h3 className="text-base font-display transition-colors">{p.title}</h3>
             <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 flex-1">{p.description}</p>
             <div className="flex gap-3 pt-2 border-t border-border">
                 <Link href={p.link} className="font-mono text-[9px] flex items-center gap-1 hover:text-primary transition-colors">DEMO <ExternalLink className="size-2.5" /></Link>
@@ -169,7 +169,7 @@ export function ProjectsSection() {
             </div>
 
             {/* Featured Project (first one — big) */}
-            <GlassPanel background="bg-card/50" className="mb-6 group relative border border-border hover:border-primary/50 transition-all duration-500">
+            <GlassPanel opaque className="mb-6 group relative border border-border hover:border-primary/50 transition-all duration-500">
                 <div className="grid md:grid-cols-[1fr_1fr] min-h-[360px]">
                     {/* Image side — TiltedCard 3D effect */}
                     <TiltedCard
@@ -187,17 +187,17 @@ export function ProjectsSection() {
                     {/* Content side */}
                     <div className="p-8 flex flex-col justify-between relative">
                         {/* Index number */}
-                        <div className="absolute top-6 right-8 font-mono text-[80px] font-bold text-border leading-none select-none pointer-events-none">
+                        <div className="absolute top-6 right-8 font-mono text-[80px] font-bold text-border leading-none select-none pointer-events-none z-0">
                             01
                         </div>
-                        <div>
+                        <div className="relative z-10">
                             <div className="flex items-center gap-3 mb-4">
                                 <span className={cn("font-mono text-[10px] tracking-widest", statusColor[projects[0].status])}>
                                     ◉ {projects[0].status}
                                 </span>
                                 <span className="font-mono text-[10px] text-muted-foreground">// {projects[0].year}</span>
                             </div>
-                            <h3 className="text-3xl md:text-4xl font-display tracking-tighter mb-4 group-hover:text-primary transition-colors">
+                            <h3 className="text-3xl md:text-4xl font-display tracking-tighter mb-4 transition-colors">
                                 {projects[0].title}
                             </h3>
                             <p className="text-muted-foreground leading-relaxed mb-6 max-w-sm">
@@ -240,7 +240,7 @@ export function ProjectsSection() {
                             <div className="mt-4 flex justify-center">
                                 <button
                                     onClick={() => setShowAll((v) => !v)}
-                                    className="group font-mono text-xs px-8 py-3 border border-border hover:border-primary bg-card hover:bg-primary/5 transition-all duration-300 flex items-center gap-3"
+                                    className="group font-mono text-xs px-8 py-3 border border-border hover:border-primary bg-card/80 transition-all duration-300 flex items-center gap-3"
                                 >
                                     <span className="text-primary">▸</span>
                                     {showAll

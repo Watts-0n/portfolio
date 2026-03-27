@@ -9,6 +9,7 @@ import LogoLoop from "@/components/ui/LogoLoop";
 import { HeroSection } from "@/components/home/hero-section";
 import { ProjectsSection } from "@/components/home/projects-section";
 import { ContactSection } from "@/components/home/contact-section";
+import { ExperienceList } from "@/components/home/experience-list";
 
 // This is a Next.js Server Component by default in App Router
 export default function Home() {
@@ -82,30 +83,29 @@ export default function Home() {
               { icon: <Cpu className="h-6 w-6" />, label: "PERFORMANCE", desc: "Sub-100ms render targets" },
               { icon: <Terminal className="h-6 w-6" />, label: "DEVOPS", desc: "CI/CD, IaC, containerization" },
             ].map((attr, i) => (
-              <div
+              <GlassPanel corners={false}
                 key={i}
                 className="group p-4 border border-border bg-background hover:border-primary transition-all duration-300 flex flex-col gap-2 relative overflow-hidden"
               >
-                {/* Corner accent */}
                 <div className="absolute top-0 left-0 w-4 h-[2px] bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="absolute top-0 left-0 w-[2px] h-4 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                 <span className="text-primary">{attr.icon}</span>
                 <span className="font-mono text-[10px] font-bold tracking-widest">{attr.label}</span>
                 <span className="font-mono text-[9px] text-muted-foreground leading-relaxed">{attr.desc}</span>
-              </div>
+              </GlassPanel>
             ))}
 
             {/* Extra: tools list */}
-            <div className="col-span-2 mt-2 p-4 border border-border bg-background">
+            <GlassPanel className="col-span-2 mt-2 p-4 border border-border bg-background">
               <div className="font-mono text-[10px] text-muted-foreground mb-3">// TOOLS &amp; STACK</div>
               <div className="flex flex-wrap gap-1.5">
                 {["Git", "Linux", "AWS", "Kubernetes", "Figma", "Docker", "Vim", "Terraform"].map((tool) => (
-                  <span key={tool} className="font-mono text-[9px] px-2 py-1 border border-border hover:border-primary hover:text-primary transition-colors cursor-default">
+                  <span key={tool} className=" bg-card/50 font-mono text-[9px] px-2 py-1 border border-border hover:border-primary hover:text-primary transition-colors cursor-default">
                     {tool}
                   </span>
                 ))}
               </div>
-            </div>
+            </GlassPanel>
           </div>
         </div>
       </Container>
@@ -163,7 +163,7 @@ export default function Home() {
             </h2>
             <div className="h-[2px] w-24 bg-primary" />
           </div>
-          <Button variant="outline" className="font-mono text-xs hidden md:flex items-center gap-2 border-primary/30 hover:border-primary hover:text-primary">
+          <Button variant="outline" className="font-mono text-xs hidden md:flex items-center gap-2 border-primary/30 hover:border-primary hover:text-black">
             VIEW_FULL_CV <ChevronRight className="size-3" />
           </Button>
         </div>
@@ -171,7 +171,7 @@ export default function Home() {
         {/* Terminal-style post list */}
         <GlassPanel corners={false} className="border border-border">
           {/* Terminal bar */}
-          <div className="border-b border-border bg-card px-4 py-2 flex items-center gap-2">
+          <div className="border-b border-border bg-card/70 px-4 py-2 flex items-center gap-2">
             <div className="flex gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-400/60" />
@@ -181,39 +181,7 @@ export default function Home() {
           </div>
 
           {/* Projects */}
-          {experience.map((item, index) => (
-            <div key={index} className="group block">
-              <div className="grid md:grid-cols-[60px_1fr_auto] items-stretch border-b border-border last:border-b-0 hover:bg-card transition-colors duration-200">
-                {/* Line number */}
-                <div className="font-mono text-xs text-muted-foreground/60 border-r border-border flex items-center justify-center p-4 select-none">
-                  {item.lineNum}
-                </div>
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    {item.tags.map((tag) => (
-                      <span key={tag} className="font-mono text-[9px] px-1.5 py-0.5 border border-primary/30 text-primary">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-display group-hover:text-primary transition-colors mb-2 text-balance leading-tight">
-                    {item.title} <span className="text-primary/50 text-base md:text-lg">@ {item.company}</span>
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed max-w-2xl">
-                    {item.excerpt}
-                  </p>
-                </div>
-                {/* Metadata */}
-                <div className="border-l border-border flex flex-col justify-center items-end gap-2 p-4 md:p-6 min-w-[120px]">
-                  <span className="font-mono text-[9px] text-muted-foreground whitespace-nowrap">{item.date}</span>
-                  <div className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground uppercase">
-                    <div className="size-1.5 rounded-full bg-primary" /> {item.readTime}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          <ExperienceList items={experience} />
         </GlassPanel>
 
         <div className="text-center mt-8 md:hidden">
@@ -240,13 +208,13 @@ export default function Home() {
             </div>
           </div>
           <div className="flex gap-6 text-xs font-mono text-muted-foreground">
-            <Link href="#projects" className="hover:text-primary transition-colors">Projects</Link>
-            <Link href="#skills" className="hover:text-primary transition-colors">Skills</Link>
-            <Link href="#experience" className="hover:text-primary transition-colors">Experience</Link>
-            <Link href="#contact" className="hover:text-primary transition-colors">Contact</Link>
-            <Link href="#" className="hover:text-primary transition-colors">GITHUB</Link>
-            <Link href="#" className="hover:text-primary transition-colors">LINKEDIN</Link>
-            <Link href="#" className="hover:text-primary transition-colors">TWITTER</Link>
+            <Link href="#projects" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Projects</Link>
+            <Link href="#skills" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Skills</Link>
+            <Link href="#experience" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Experience</Link>
+            <Link href="#contact" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Contact</Link>
+            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">GITHUB</Link>
+            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">LINKEDIN</Link>
+            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">TWITTER</Link>
           </div>
         </div>
       </Container>

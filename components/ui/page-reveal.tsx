@@ -1,12 +1,24 @@
 "use client";
 import { motion } from "motion/react";
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useLayoutEffect } from "react";
 import { globalLoadingState } from "@/lib/loading-state";
+
+const useIsomorphicLayoutEffect =
+    typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function PageReveal({ children }: { children: ReactNode }) {
     const [isLoaded, setIsLoaded] = useState(globalLoadingState.getIsLoaded());
 
-    useEffect(() => {
+    useIsomorphicLayoutEffect(() => {
+        // If preloader was cached, trigger reveal immediately (before paint)
+        try {
+            if (sessionStorage.getItem("preloader_shown")) {
+                setIsLoaded(true);
+                globalLoadingState.setLoaded(true);
+                return;
+            }
+        } catch {}
+
         const unsubscribe = globalLoadingState.subscribe(setIsLoaded);
         return unsubscribe;
     }, []);
@@ -20,4 +32,4 @@ export function PageReveal({ children }: { children: ReactNode }) {
             {children}
         </motion.div>
     );
-}
+}

@@ -503,7 +503,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 },
                 uClickTimes: { value: new Float32Array(MAX_CLICKS) },
                 uShapeType: { value: SHAPE_MAP[variant] ?? 0 },
-                uPixelSize: { value: pixelSize * renderer.getPixelRatio() },
+                uPixelSize: { value: pixelSize },
                 uScale: { value: patternScale },
                 uDensity: { value: patternDensity },
                 uPixelJitter: { value: pixelSizeJitter },
@@ -543,7 +543,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uniforms.uResolution.value.set(renderer.domElement.width, renderer.domElement.height);
                 if (threeRef.current?.composer)
                     threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
-                uniforms.uPixelSize.value = pixelSize * renderer.getPixelRatio();
+                uniforms.uPixelSize.value = pixelSize;
                 uniforms.uPixelRatio.value = renderer.getPixelRatio();
             };
             setSize();
@@ -706,7 +706,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         } else {
             const t = threeRef.current!;
             t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
-            t.uniforms.uPixelSize.value = pixelSize * t.renderer.getPixelRatio();
+            t.uniforms.uPixelSize.value = pixelSize;
             t.uniforms.uColor.value.set(color);
             t.uniforms.uScale.value = patternScale;
             t.uniforms.uDensity.value = patternDensity;

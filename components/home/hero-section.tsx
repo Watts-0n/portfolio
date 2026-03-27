@@ -41,14 +41,14 @@ export function HeroSection() {
                     Dāvids<span className="text-primary">_</span>Locāns
                 </div>
                 <nav className="hidden md:flex gap-8 text-sm font-medium text-muted-foreground ">
-                    <Link href="#projects" className="hover:text-primary transition-colors">Projects</Link>
-                    <Link href="#skills" className="hover:text-primary transition-colors">Skills</Link>
-                    <Link href="#experience" className="hover:text-primary transition-colors">Experience</Link>
-                    <Link href="#contact" className="hover:text-primary transition-colors">Contact</Link>
+                    <Link href="#projects" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Projects</Link>
+                    <Link href="#skills" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Skills</Link>
+                    <Link href="#experience" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Experience</Link>
+                    <Link href="#contact" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Contact</Link>
                 </nav>
                 <Button
                     variant="outline"
-                    className="font-mono text-xs border-primary/50 hover:bg-primary/10 hover:text-primary hover:border-primary"
+                    className="font-mono text-xs border-primary/50 hover:bg-primary/10 hover:text-black hover:border-primary"
                 >
                     resume_v4.pdf
                 </Button>

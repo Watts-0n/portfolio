@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Github, Linkedin, Mail, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,41 +9,60 @@ import DecryptedText from "@/components/ui/decryptText";
 import StatusPanel from "@/components/ui/statusPanel";
 import { projects } from "@/lib/data";
 
-const PixelBlast = dynamic(() => import("@/components/ui/background"), {
-    ssr: false,
-});
-
 export function HeroSection() {
+    const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement | HTMLDivElement>, id: string) => {
+        e.preventDefault();
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+        } else if (id === "top") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    };
+
     return (
         <>
-            <div className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
-                <PixelBlast
-                    variant="triangle"
-                    pixelSize={4}
-                    color="#c0c0c0"
-                    patternScale={50}
-                    patternDensity={0.3}
-                    pixelSizeJitter={0}
-                    enableRipples={false}
-                    speed={0.5}
-                    edgeFade={0}
-                    transparent
-                />
-            </div>
             {/* Navigation / Header */}
             <Container
                 component="header"
                 wrapperClassName="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-sm"
                 className="mx-auto max-w-7xl flex items-center justify-between h-16 uppercase"
             >
-                <div className="text-xl font-bold font-mono tracking-tighter">
+                <div
+                    className="text-xl font-bold font-mono tracking-tighter cursor-pointer"
+                    onClick={(e) => scrollToSection(e, "top")}
+                >
                     Dāvids<span className="text-primary">_</span>Locāns
                 </div>
                 <nav className="hidden md:flex gap-8 text-sm font-medium text-muted-foreground ">
-                    <Link href="#projects" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Projects</Link>
-                    <Link href="#skills" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Skills</Link>
-                    <Link href="#experience" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Experience</Link>
-                    <Link href="#contact" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Contact</Link>
+                    <a
+                        href="#projects"
+                        onClick={(e) => scrollToSection(e, "projects")}
+                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                    >
+                        Projects
+                    </a>
+                    <a
+                        href="#skills"
+                        onClick={(e) => scrollToSection(e, "skills")}
+                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                    >
+                        Skills
+                    </a>
+                    <a
+                        href="#experience"
+                        onClick={(e) => scrollToSection(e, "experience")}
+                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                    >
+                        Experience
+                    </a>
+                    <a
+                        href="#contact"
+                        onClick={(e) => scrollToSection(e, "contact")}
+                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                    >
+                        Contact
+                    </a>
                 </nav>
                 <Button
                     variant="outline"
@@ -59,14 +77,7 @@ export function HeroSection() {
                 wrapperClassName="relative select-none min-h-screen flex items-center pt-16 overflow-hidden"
                 className="mx-auto max-w-7xl flex-1"
             >
-                {/* Background Image with Overlay */}
-                <div className="fixed w-screen h-dvh inset-0 z-0">
-                    <div className="relative w-screen h-dvh bg-background overflow-hidden">
-                        <div className="animate-hero-breathe absolute inset-0 bg-cover bg-center bg-no-repeat bg-[url('/hero-bg.jpg')] before:absolute before:inset-0 before:bg-primary before:mix-blend-color-dodge dark:before:mix-blend-color" />
-                    </div>
-                    <div className="absolute inset-0 bg-linear-to-b from-background/80 via-background/50 to-background" />
-                </div>
-
+                {/* Background removed - handled globally in layout.tsx */}
                 <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center pt-8 pt:sm-0">
                     <div className="space-y-6">
                         <div className="inline-flex backdrop-blur-xs items-center gap-2 py-1 px-3 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-mono">

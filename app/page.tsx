@@ -10,11 +10,12 @@ import { HeroSection } from "@/components/home/hero-section";
 import { ProjectsSection } from "@/components/home/projects-section";
 import { ContactSection } from "@/components/home/contact-section";
 import { ExperienceList } from "@/components/home/experience-list";
+import { Footer } from "@/components/home/footer";
 
 // This is a Next.js Server Component by default in App Router
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground overflow-x-hidden">
+    <div className="relative min-h-screen text-foreground selection:bg-primary selection:text-primary-foreground overflow-x-hidden">
 
       <HeroSection />
 
@@ -115,7 +116,7 @@ export default function Home() {
       ═══════════════════════════════════════════ */}
       <Container
         component="section"
-        wrapperClassName="relative z-10 py-12 border-t border-b border-border backdrop-blur-[3px] shadow-lg"
+        wrapperClassName="relative z-10 py-12 border-t border-b bg-card/10 border-border/30 backdrop-blur-md shadow-lg"
         className="max-w-7xl mx-auto"
       >
         <LogoLoop
@@ -191,33 +192,7 @@ export default function Home() {
 
       <ContactSection />
 
-      {/* Footer */}
-      <Container
-        component="footer"
-        wrapperClassName="relative z-10 border-t border-border bg-background"
-        className="py-12 max-w-7xl mx-auto"
-      >
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="text-sm font-bold font-mono tracking-tighter">
-              Dāvids<span className="text-primary">_</span>Locāns
-            </div>
-            <div className="w-px h-4 bg-border" />
-            <div className="text-xs font-mono text-muted-foreground">
-              © 2025. ALL RIGHTS RESERVED.
-            </div>
-          </div>
-          <div className="flex gap-6 text-xs font-mono text-muted-foreground">
-            <Link href="#projects" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Projects</Link>
-            <Link href="#skills" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Skills</Link>
-            <Link href="#experience" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Experience</Link>
-            <Link href="#contact" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">Contact</Link>
-            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">GITHUB</Link>
-            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">LINKEDIN</Link>
-            <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">TWITTER</Link>
-          </div>
-        </div>
-      </Container>
+      <Footer />
     </div>
   );
 }

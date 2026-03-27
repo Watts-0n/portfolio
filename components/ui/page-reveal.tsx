@@ -6,7 +6,7 @@ import { globalLoadingState } from "@/lib/loading-state";
 const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export function PageReveal({ children }: { children: ReactNode }) {
+export function PageReveal({ children, className }: { children: ReactNode; className?: string }) {
     const [isLoaded, setIsLoaded] = useState(globalLoadingState.getIsLoaded());
 
     useIsomorphicLayoutEffect(() => {
@@ -28,6 +28,7 @@ export function PageReveal({ children }: { children: ReactNode }) {
             initial={{ opacity: 1, y: "100vh" }}
             animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 1, y: "100vh" }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+            className={className}
         >
             {children}
         </motion.div>

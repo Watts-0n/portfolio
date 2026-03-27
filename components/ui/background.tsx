@@ -152,7 +152,7 @@ const createLiquidEffect = (texture: THREE.Texture, opts?: { strength?: number; 
     uniform float uStrength;
     uniform float uTime;
     uniform float uFreq;
-    uniform vec2 uResolution;
+    uniform vec2 uCanvasSize;
 
     void mainUv(inout vec2 uv) {
       vec4 tex = texture2D(uTexture, uv);
@@ -164,7 +164,7 @@ const createLiquidEffect = (texture: THREE.Texture, opts?: { strength?: number; 
       float amt = uStrength * intensity * wave;
 
       // Compensate for aspect ratio to ensure uniform displacement in pixels
-      float aspect = uResolution.x / uResolution.y;
+      float aspect = uCanvasSize.x / uCanvasSize.y;
       uv += vec2(vx / aspect, vy) * amt;
     }
     `;
@@ -174,7 +174,7 @@ const createLiquidEffect = (texture: THREE.Texture, opts?: { strength?: number; 
             ['uStrength', new THREE.Uniform(opts?.strength ?? 0.025)],
             ['uTime', new THREE.Uniform(0)],
             ['uFreq', new THREE.Uniform(opts?.freq ?? 4.5)],
-            ['uResolution', new THREE.Uniform(new THREE.Vector2(1, 1))]
+            ['uCanvasSize', new THREE.Uniform(new THREE.Vector2(1, 1))]
         ])
     });
 };
@@ -195,7 +195,7 @@ const FRAGMENT_SRC = `
 precision highp float;
 
 uniform vec3  uColor;
-uniform vec2  uResolution;
+uniform vec2  uCanvasSize;
 uniform float uTime;
 uniform float uPixelSize;
 uniform float uScale;
@@ -206,7 +206,7 @@ uniform float uRippleSpeed;
 uniform float uRippleThickness;
 uniform float uRippleIntensity;
 uniform float uEdgeFade;
-uniform float uPixelRatio;
+uniform float uStretchY;
 
 uniform int   uShapeType;
 const int SHAPE_SQUARE   = 0;
@@ -238,7 +238,7 @@ float bayer8(vec2 p) {
     return BAYER_8x8[i.y * 8 + i.x];
 }
 
-#define FBM_OCTAVES     5
+#define FBM_OCTAVES     3
 #define FBM_LACUNARITY  1.25
 #define FBM_GAIN        1.0
 
@@ -304,8 +304,15 @@ float maskDiamond(vec2 p, float cov){
 
 void main(){
   float pixelSize = uPixelSize;
-  vec2 fragCoord = gl_FragCoord.xy - uResolution * .5;
-  float aspectRatio = uResolution.x / uResolution.y;
+  // Use raw pixel coordinates — no resolution-based centering.
+  // This makes the pattern layout completely independent of screen
+  // dimensions, preventing stretching when mobile browsers resize
+  // the viewport (toolbar hide/show, orientation changes, etc.).
+  vec2 fragCoord = gl_FragCoord.xy;
+  // Compensate for CSS stretch when buffer height is capped below
+  // the actual display height (to stay within GPU max texture size).
+  // This makes each pixel cell appear square on screen.
+  fragCoord.y *= uStretchY;
 
   vec2 pixelId = floor(fragCoord / pixelSize);
   vec2 pixelUV = fract(fragCoord / pixelSize);
@@ -314,11 +321,10 @@ void main(){
   vec2 cellId = floor(fragCoord / cellPixelSize);
   vec2 cellCoord = cellId * cellPixelSize;
   
-  // Normalize to CSS-pixel space before computing UVs so the pattern
-  // density is identical regardless of device pixel ratio (DPR).
-  // Without this, high-DPR mobile screens stretch the pattern because
-  // gl_FragCoord is in physical pixels which are 2-3x larger.
-  vec2 uv = (cellCoord / uPixelRatio) / 1000.0;
+  // Use raw pixel coordinates divided by a fixed constant for UV.
+  // No DPR or resolution dependency — the pattern tiles identically
+  // on every device since pixelSize is already in physical pixels.
+  vec2 uv = cellCoord / 1000.0;
 
   float base = fbm2(uv, uTime * 0.05);
   base = base * 0.5 - 0.65;
@@ -335,7 +341,7 @@ void main(){
       vec2 pos = uClickPos[i];
       if (pos.x < 0.0) continue;
       float cellPixelSize = 8.0 * pixelSize;
-      vec2 cuv = ((pos - uResolution * .5 - cellPixelSize * .5) / uPixelRatio) / 1000.0;
+      vec2 cuv = (pos - cellPixelSize * .5) / 1000.0;
       float t = max(uTime - uClickTimes[i], 0.0);
       float r = distance(uv, cuv);
       float waveR = speed * t;
@@ -358,7 +364,10 @@ void main(){
   else                                   M = coverage;
 
   if (uEdgeFade > 0.0) {
-    vec2 norm = gl_FragCoord.xy / uResolution;
+    // Use CSS-pixel canvas size for edge fade so it's independent of
+    // device resolution / DPR. uCanvasSize is set from container
+    // clientWidth/clientHeight, not from the GL drawing buffer.
+    vec2 norm = gl_FragCoord.xy / uCanvasSize;
     float edge = min(min(norm.x, norm.y), min(1.0 - norm.x, 1.0 - norm.y));
     float fade = smoothstep(0.0, uEdgeFade, edge);
     M *= fade;
@@ -415,7 +424,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
         clock: THREE.Clock;
         clickIx: number;
         uniforms: {
-            uResolution: { value: THREE.Vector2 };
+            uCanvasSize: { value: THREE.Vector2 };
             uTime: { value: number };
             uColor: { value: THREE.Color };
             uClickPos: { value: THREE.Vector2[] };
@@ -430,7 +439,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             uRippleThickness: { value: number };
             uRippleIntensity: { value: number };
             uEdgeFade: { value: number };
-            uPixelRatio: { value: number };
+            uStretchY: { value: number };
         };
         resizeObserver?: ResizeObserver;
         raf?: number;
@@ -489,13 +498,14 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 console.warn('PixelBlast: Failed to create WebGL renderer.', e);
                 return;
             }
-            renderer.domElement.style.display = 'block';
             renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            renderer.domElement.style.cssText =
+                'display:block;pointer-events:none;width:100%;height:100%;';
             container.appendChild(renderer.domElement);
             if (transparent) renderer.setClearAlpha(0);
             else renderer.setClearColor(0x000000, 1);
             const uniforms = {
-                uResolution: { value: new THREE.Vector2(0, 0) },
+                uCanvasSize: { value: new THREE.Vector2(1, 1) },
                 uTime: { value: 0 },
                 uColor: { value: new THREE.Color(color) },
                 uClickPos: {
@@ -512,7 +522,7 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                 uRippleThickness: { value: rippleThickness },
                 uRippleIntensity: { value: rippleIntensityScale },
                 uEdgeFade: { value: edgeFade },
-                uPixelRatio: { value: renderer.getPixelRatio() }
+                uStretchY: { value: 1 }
             };
             const scene = new THREE.Scene();
             const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -532,19 +542,29 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             const setSize = () => {
                 const w = container.clientWidth || 1;
                 const h = container.clientHeight || 1;
-                // Use `true` (default) for updateStyle so Three.js sets both
-                // the canvas drawing-buffer AND its CSS width/height in px.
-                // Previously `false` was used, which left CSS at 100%/100%.
-                // On mobile, the CSS container can grow taller when the browser
-                // toolbar hides, but the buffer stayed at the old size — the
-                // browser then *stretched* the smaller buffer to fill the
-                // larger CSS box, causing vertical distortion.
-                renderer.setSize(w, h);
-                uniforms.uResolution.value.set(renderer.domElement.width, renderer.domElement.height);
+                // Cap buffer height to GPU max texture size to prevent
+                // silent clamping that causes stretching on mobile.
+                const dpr = renderer.getPixelRatio();
+                const maxBufH = Math.floor(
+                    (renderer.capabilities.maxTextureSize || 4096) / dpr
+                );
+                const cappedH = Math.min(h, maxBufH);
+                // Set buffer only (false) — CSS is 100%×100% to fill container.
+                // If buffer is shorter than display, the browser stretches it.
+                // The shader compensates via uStretchY.
+                renderer.setSize(w, cappedH, false);
+                const bufW = renderer.domElement.width;
+                const bufH = renderer.domElement.height;
+                uniforms.uCanvasSize.value.set(bufW, bufH);
+                uniforms.uStretchY.value = h / cappedH;
                 if (threeRef.current?.composer)
-                    threeRef.current.composer.setSize(renderer.domElement.width, renderer.domElement.height);
-                uniforms.uPixelSize.value = pixelSize;
-                uniforms.uPixelRatio.value = renderer.getPixelRatio();
+                    threeRef.current.composer.setSize(bufW, bufH);
+                // Scale pixel size and noise frequency so the pattern has
+                // the same visual density on every screen width.
+                const visibleBufW = w * dpr;
+                const sf = Math.max(0.5, Math.min(1, visibleBufW / 1920));
+                uniforms.uPixelSize.value = pixelSize * sf;
+                uniforms.uScale.value = patternScale / sf;
             };
             setSize();
             // Use a rAF guard instead of setTimeout debounce so the canvas
@@ -668,8 +688,10 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
                     const liqEffect = liquidEffect as Effect & { uniforms: Map<string, THREE.Uniform> };
                     const timeUniform = liqEffect.uniforms.get('uTime');
                     if (timeUniform) timeUniform.value = currentTime;
-                    const resUniform = liqEffect.uniforms.get('uResolution');
-                    if (resUniform) resUniform.value.set(renderer.domElement.width, renderer.domElement.height);
+                    const canvasSizeUniform = liqEffect.uniforms.get('uCanvasSize');
+                    if (canvasSizeUniform) canvasSizeUniform.value.set(
+                        renderer.domElement.width, renderer.domElement.height
+                    );
                 }
                 if (composer) {
                     if (touch) touch.update();
@@ -705,10 +727,14 @@ const PixelBlast: React.FC<PixelBlastProps> = ({
             };
         } else {
             const t = threeRef.current!;
+            // Apply the same viewport density scaling as setSize
+            const dpr = t.renderer.getPixelRatio();
+            const visBufW = (container.clientWidth || 1) * dpr;
+            const sf = Math.max(0.5, Math.min(1, visBufW / 1920));
             t.uniforms.uShapeType.value = SHAPE_MAP[variant] ?? 0;
-            t.uniforms.uPixelSize.value = pixelSize;
+            t.uniforms.uPixelSize.value = pixelSize * sf;
             t.uniforms.uColor.value.set(color);
-            t.uniforms.uScale.value = patternScale;
+            t.uniforms.uScale.value = patternScale / sf;
             t.uniforms.uDensity.value = patternDensity;
             t.uniforms.uPixelJitter.value = pixelSizeJitter;
             t.uniforms.uEnableRipples.value = enableRipples ? 1 : 0;

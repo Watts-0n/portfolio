@@ -901,7 +901,7 @@ export default function SplashCursor(props: SplashCursorProps) {
   }, []); // ← runs once; live config is read via configRef each frame
 
   return (
-    <div className="fixed top-0 left-0 z-1 pointer-events-none w-full h-full">
+    <div className="fixed top-0 left-0 z-[1] pointer-events-none w-full h-full">
       <canvas ref={canvasRef} id="fluid" className="w-screen h-screen block"></canvas>
     </div>
   );

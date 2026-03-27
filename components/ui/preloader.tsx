@@ -154,7 +154,7 @@ export function Preloader() {
                     initial={{ opacity: 1 }}
                     exit={{ y: "-100%" }}
                     transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-                    className="fixed inset-0 z-100 bg-background flex flex-col items-start justify-end p-8 md:p-12 overflow-hidden"
+                    className="fixed inset-0 z-[100] bg-background flex flex-col items-start justify-end p-8 md:p-12 overflow-hidden"
                 >
                     {/* Subtle grid background */}
                     <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "linear-gradient(to right, #808080 1px, transparent 1px), linear-gradient(to bottom, #808080 1px, transparent 1px)", backgroundSize: "40px 40px" }} />

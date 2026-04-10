@@ -13,20 +13,32 @@ export async function POST(req: Request) {
             );
         }
 
+        const user = process.env.EMAIL_USER;
+        const pass = process.env.EMAIL_PASS?.replace(/\s+/g, "");
+
+        if (!user || !pass) {
+            console.error("Missing email configuration environment variables.");
+            return NextResponse.json(
+                { error: "Server configuration error. Missing credentials." },
+                { status: 500 }
+            );
+        }
+
         // Configure nodemailer transport
-        // Make sure EMAIL_USER and EMAIL_PASS are configured in your .env.local file
         const transporter = nodemailer.createTransport({
-            service: "gmail",
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true, // Use SSL
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: user,
+                pass: pass,
             },
         });
 
         // Email layout
         const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Sending the email to yourself
+            from: user,
+            to: user, // Sending the email to yourself
             replyTo: email, // This allows you to directly reply to the user's email
             subject: `Portfolio Contact: ${subject || "No Subject"} - from ${name}`,
             html: `

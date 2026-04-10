@@ -4,7 +4,8 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 import { SkillBar } from "@/components/ui/skill-bar";
 import { skills, experience } from "@/lib/data";
 import { ChevronRight, ArrowUpRight, Clock, Code2, Database, Cpu, Terminal, Braces, Layers, Server, Container as ContainerIcon, Boxes, Globe, Palette, Workflow, GitBranch, MonitorSmartphone } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import LogoLoop from "@/components/ui/LogoLoop";
 import { HeroSection } from "@/components/home/hero-section";
 import { ProjectsSection } from "@/components/home/projects-section";
@@ -100,7 +101,7 @@ export default function Home() {
             <GlassPanel className="col-span-2 mt-2 p-4 border border-border bg-background">
               <div className="font-mono text-[10px] text-muted-foreground mb-3">// TOOLS &amp; STACK</div>
               <div className="flex flex-wrap gap-1.5">
-                {["Git", "Linux", "AWS", "Kubernetes", "Figma", "Docker", "Vim", "Terraform"].map((tool) => (
+                {["Git", "Linux", "AWS", "Next.JS", "Figma", "Docker", "WordPress", "Adobe XD"].map((tool) => (
                   <span key={tool} className=" bg-card/50 font-mono text-[9px] px-2 py-1 border border-border hover:border-primary hover:text-primary transition-colors cursor-default">
                     {tool}
                   </span>
@@ -164,9 +165,14 @@ export default function Home() {
             </h2>
             <div className="h-[2px] w-24 bg-primary" />
           </div>
-          <Button variant="outline" className="font-mono text-xs hidden md:flex items-center gap-2 border-primary/30 hover:border-primary hover:text-black">
+          <Link
+            href="/davids-cv-en-4.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ variant: "outline" }), "font-mono text-xs hidden md:flex items-center gap-2 border-primary/30 hover:border-primary hover:text-black")}
+          >
             VIEW_FULL_CV <ChevronRight className="size-3" />
-          </Button>
+          </Link>
         </div>
 
         {/* Terminal-style post list */}

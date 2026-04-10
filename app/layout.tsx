@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     description,
     url: "./",
     siteName: title,
-    images: "/og.jpg",
+    images: "/og.png",
   },
 };
 

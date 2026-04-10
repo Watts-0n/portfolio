@@ -1,0 +1,135 @@
+Skills
+Programming Languages
+Tools & Technologies
+Databases
+Performance Optimization
+Security
+Frontend Development
+Languages
+English
+Latvian
+Russian
+Dāvids Locāns
+IT specialist, full-stack web developer
+davidslocans@gmail.com+37127898659Latvia, Jelgava
+watts0n.vercel.app
+Summary
+I don’t just write code — I design systems. For the last five years
+I’ve been the architect behind critical digital infrastructure in
+Latvia. I don’t see myself as someone who closes tickets; I take
+ownership of the entire mission — from the first sketch to the final
+layer of server security.
+I specialize in high-stakes portals where security and scale aren't
+optional. Whether I'm building a tool for a citizen to report a road
+hazard or a secure gateway for national labs, my goal is to make
+complex data feel human and accessible. Outside of my main builds, I’m
+usually found mentoring the next generation or pushing the boundaries
+of what's possible with VR, AI and technical art to find new ways to
+visualize the world.
+Experience
+SIA "Cloud Enterprise Systems"
+Full stack developer
+Latvia, Jelgava
+2023 - 2026
+Cloud Enterprise Systems is a software development firm specializing in
+enterprise-grade information systems, mobile applications, and complex
+web architecture. The agency is a strategic partner for Latvian
+national institutions, delivering high-availability portals that manage
+critical public and scientific data.
+Role & Impact:
+National Infrastructure Lead: Collaborated within an agile team
+of developers and designers to engineer high-traffic WordPress
+portals for national bodies.
+Accessibility & Compliance Specialist: Authored comprehensive
+technical assessments and implemented accessibility updates,
+ensuring 100% compliance with national standards for public-
+sector platforms.
+Youth center “Pakāpiens” Latvia, Jelgava
+2024 - 2026
+The youth center is a community-centric hub dedicated to the personal
+and professional development of young people through innovative
+educational programs and informal training.
+Role & Impact:
+Systems Architect: Acted as the primary technical lead,
+responsible for the center's digital infrastructure.
+Data Automation Engineer: Designed and deployed a custom "Big
+Data" reporting engine and registration system, automating high-
+volume data collection.
+Immersive Media Developer: Engineered a 360 VR platform
+compatible with VR glasses, facilitating virtual tours
+Technical Mentor: Combined hardware and software expertise with
+interpersonal leadership to work directly with youths, fostering
+digital literacy and technical problem-solving skills.
+Education
+"Jelgavas tehnikums"
+Programming technician
+Professional secondary education
+2019 - 2023
+PHP, JavaScript, TypeScript,
+Python
+React, Next.js, WordPress
+MySQL, PostgreSQL, MongoDB
+Lazy Loading, Caching
+Strategies, Asset Optimization,
+Core Web Vitals
+OWASP Principles, Input
+Validation, OAuth, HTTPS,
+Secure APIs
+HTML5, CSS3, Sass, Tailwind
+CSS, Bootstrap
+B2
+Native
+Native
+Projects
+BIOR (Institute of Food Safety, Animal Health and Environment)
+Institutional Gateway and Secure Client Portal Architected a sophisticated institutional gateway
+featuring a secure, multi-layered Client Portal designed for laboratory service coordination and
+scientific resource management. The platform streamlines the submission of laboratory samples and the
+dissemination of results across food safety, animal health, and environmental sectors.
+https://bior.lv
+Latvijas Valsts Ceļi (Latvian State Roads)
+Primary Digital Hub for National Road Infrastructure Developed the national mobility nexus for
+infrastructure management, integrating complex interactive mapping services with real-time sensor data
+and administrative boundaries.
+https://lvceli.lv
+Latvijas Skolas Soma (Latvian School Bag)
+High-Concurrency Cultural Education Platform Engineered the national platform bringing cultural heritage
+to every student in Latvia. The system is architected for massive scalability, supporting a user base of
+230,000 students and their educators every academic semester.
+https://latvijasskolassoma.lv
+Dienvidkurzemes Kultūras Mantojums (National Heritage Board of Latvia)
+Centralized Digital Heritage Repository Engineered a regional digital asset management system for
+antiquity storehouses and memorial rooms, effectively centralizing the archival and presentation of
+historical artifacts.
+https://kulturmantojums.lv
+Latgales Centrālā Bibliotēka (Latgale Central Library)
+Multi-faceted Public Information Portal Built a comprehensive digital hub managing regional library
+branches and specialized community centers, emphasizing digital literacy and accessibility.
+https://lcb.lv
+APPC (East European Policy Research Centre)
+Content-First Geopolitical Research Platform Developed a strategic communication platform designed for
+the dissemination of foreign policy expertise, focusing on national security, defense, and hybrid
+threats.
+https://appc.lv
+Digital lessons (State Police project)
+Gamified Public Safety Training Developed a series of interactive, age-appropriate educational games
+focused on road traffic safety and public order, utilized within national school lecture frameworks.
+14-18 years - https://csd3.cryptoquantfund.eu/
+9-13 years - https://csd2.cryptoquantfund.eu/
+6-8 years - https://csd1.cryptoquantfund.eu/
+Youth Registration & Analytics Engine - Youth Center "Pakāpiens"
+Automating high-volume data collection and youth engagement tracking.
+This tool replaced manual tracking, drastically reducing administrative overhead and ensuring data
+integrity for institutional reporting.
+Immersive 360 VR Explorer - Spatial Learning Platform
+Bridging the gap between hardware and education through immersive media.
+I engineered a 360 VR platform specifically designed for use with VR glasses to facilitate interactive
+virtual tours.
+Beyond development, I acted as a Technical Mentor, leading workshops to help youth solve technical
+problems and build digital literacy through this immersive medium.
+Volunteer
+SIA "Cloud Enterprise Systems" 2021 - 2023
+Began my professional trajectory through a strategic volunteer term at SIA Cloud Enterprise Systems
+(CES), in software development solutions. My focus during this period was the end-to-end creation of
+digital lesson games for schools, a role that required balancing complex programming with intuitive UI/UX
+design for younger audiences.

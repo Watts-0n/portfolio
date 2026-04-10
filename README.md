@@ -1,46 +1,69 @@
-# Devstarter - by Zippystarter
+# Dāvids Locāns - Full Stack Developer Portfolio
 
-Devstarter is one-page developer portfolio template
-from [Zippystarter](https://zippystarter.com). It's built
-with [Next.js](https://nextjs.org) and [shadcn](https://ui.shadcn.com).
+This is the repository for my personal developer portfolio, showcasing my projects, skills, and experience. It is designed to be a high-performance, interactive, one-page terminal-inspired portal showcasing modern web development capabilities.
 
-This [shadcn template](https://zippystarter.com/templates/devstarter) is fully
-compatible with shadcn's theming system.
+## Tech Stack
 
-To experiment with [shadcn themes](https://zippystarter.com/themes), head on
-over to
-the [shadcn theme generator](https://zippystarter.com/tools/shadcn-ui-theme-generator/demo/dev-one?utm_source=https://github.com/zippystarter/template-devone)
-where you'll be able to apply themes to the template and export them for your
-own use.
+*   **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
+*   **Library:** [React 19](https://react.dev/)
+*   **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
+*   **UI Components:** [shadcn/ui](https://ui.shadcn.com) and custom interactive elements
+*   **Animations:** [Motion](https://motion.dev/) & Custom CSS Grid/Subgrid Magic
+*   **3D Graphics:** [Three.js](https://threejs.org/) (for interactive canvas effects like the `PixelBlast` background)
+*   **Icons:** [Lucide React](https://lucide.dev/)
 
-![devstarter](public/og.jpg)
+## Features
+
+*   **Single-Page Interactive Experience:** Fluid scrolling, sticky headers, and smart intersection observers for element animation based on viewport presence.
+*   **PixelBlast Three.js Background:** An optimized, interactive 3D particle simulation running in the background, pausing when outside the viewport to maximize performance.
+*   **Glassmorphism & Terminal Aesthetics:** Heavily utilizes background blurs (`backdrop-blur`), translucent cards, and decrypted-text typewriter effects.
+*   **Client-Side Scam Protection:** Uses hydration to assemble email links dynamically, shielding contact info from elementary HTML scrapers without impacting actual human users.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-Install the dependencies. I recommend using `pnpm`. If you want to use `npm`, just replace pnpm with `npm`.
+Node.js installed (LTS recommended) and `pnpm`.
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
 
 ```bash
 pnpm install
 ```
 
-Then, start the development server:
+3. Start the development server (runs on port 3002 as configured):
 
 ```bash
 pnpm dev
 ```
 
-## Notes
+4. Open [http://localhost:3002](http://localhost:3002) in your browser to view the application.
 
-This template makes use of modern CSS features such as CSS Grid & Subgrid &
-mix-blend-mode.
+## Building for Production
 
-## Learn More
+Compile a highly optimized production build:
 
-For a deeper understanding of the technologies used in this template, check out the resources listed below:
+```bash
+pnpm build
+```
 
-- [Zippystarter](https://zippystarter.com) - Learn about Zippystarter's features and products
-- [shadcn](https://ui.shadcn.com) - The front-runner in headless UI implementation
-- [Tailwind CSS](https://tailwindcss.com) - A utility-first CSS framework
-- [Next.js](https://nextjs.org/docs) - learn about Next.js features and API.
+Then start the application:
+
+```bash
+pnpm start
+```
+
+## Structure
+
+*   `app/`: Core App Router definition, layout, page structure, and global CSS.
+*   `components/ui/`: Core generic and unstyled building blocks (buttons, textareas, inputs).
+*   `components/home/`: Specific, distinct sections of the portfolio site (e.g., `hero-section.tsx`, `projects-section.tsx`, `contact-section.tsx`).
+*   `components/zippystarter/`: Pre-defined boilerplate layout wrappers such as the core `Container`.
+*   `lib/`: Lightweight utilities containing logic separated from UI (e.g., `cn` for classname merging, raw project `data.tsx`).
+
+## License
+
+© 2026 Dāvids Locāns. All Rights Reserved.

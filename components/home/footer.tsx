@@ -18,11 +18,11 @@ export function Footer() {
         <Container
             component="footer"
             wrapperClassName="relative z-10 border-t border-border bg-background"
-            className="py-12 max-w-7xl mx-auto"
+            className="py-10 max-w-7xl mx-auto"
         >
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
                 <div className="flex items-center gap-4">
-                    <div 
+                    <div
                         className="text-sm font-bold font-mono tracking-tighter cursor-pointer"
                         onClick={(e) => scrollToSection(e, "top")}
                     >
@@ -30,41 +30,43 @@ export function Footer() {
                     </div>
                     <div className="w-px h-4 bg-border" />
                     <div className="text-xs font-mono text-muted-foreground">
-                        © 2025. ALL RIGHTS RESERVED.
+                        © 2026. ALL RIGHTS RESERVED.
                     </div>
                 </div>
                 <div className="flex gap-6 text-xs font-mono text-muted-foreground">
-                    <a 
-                        href="#projects" 
+                    <a
+                        href="#projects"
                         onClick={(e) => scrollToSection(e, "projects")}
-                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                        className="hover:text-black py-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
                     >
                         Projects
                     </a>
-                    <a 
-                        href="#skills" 
+                    <a
+                        href="#skills"
                         onClick={(e) => scrollToSection(e, "skills")}
-                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                        className="hover:text-black py-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
                     >
                         Skills
                     </a>
-                    <a 
-                        href="#experience" 
+                    <a
+                        href="#experience"
                         onClick={(e) => scrollToSection(e, "experience")}
-                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                        className="hover:text-black py-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
                     >
                         Experience
                     </a>
-                    <a 
-                        href="#contact" 
+                    <a
+                        href="#contact"
                         onClick={(e) => scrollToSection(e, "contact")}
-                        className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
+                        className="hover:text-black py-1 border-b-2 border-transparent hover:border-black transition-all duration-200"
                     >
                         Contact
                     </a>
+                    {/* Temporarily removed
                     <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">GITHUB</Link>
                     <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">LINKEDIN</Link>
                     <Link href="#" className="hover:text-black pb-1 border-b-2 border-transparent hover:border-black transition-all duration-200">TWITTER</Link>
+                    */}
                 </div>
             </div>
         </Container>

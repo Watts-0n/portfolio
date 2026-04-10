@@ -64,12 +64,14 @@ export function HeroSection() {
                         Contact
                     </a>
                 </nav>
-                <Button
-                    variant="outline"
-                    className="font-mono text-xs border-primary/50 hover:bg-primary/10 hover:text-black hover:border-primary"
+                <Link
+                    href="/davids-cv-en-4.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(buttonVariants({ variant: "outline" }), "font-mono text-xs border-primary/50 hover:bg-primary/10 hover:text-black hover:border-primary")}
                 >
                     resume_v4.pdf
-                </Button>
+                </Link>
             </Container>
 
             {/* Hero Section */}
@@ -108,26 +110,25 @@ export function HeroSection() {
                             </h1>
                         </DecryptedText>
                         <p className="md:text-xl text-muted-foreground max-w-md leading-relaxed">
-                            Architecting digital voids and crafting high-performance web
-                            experiences. Specialized in scalable distributed systems and
-                            interactive 3D interfaces.
+                            I don’t just write code — I design systems. For the last five years I’ve been the architect behind critical digital infrastructure in Latvia
                         </p>
                         <div className="flex gap-6 pt-6 items-center">
                             <Link
-                                href="#projects"
+                                href="#"
+                                onClick={(e) => scrollToSection(e, "projects")}
                                 className={cn("uppercase rounded-none font-mono", buttonVariants({ variant: "default", size: "lg" }))}
                             >
                                 View projects <ArrowRight className="size-4" />
                             </Link>
                             <div className="w-px h-8 bg-border" />
                             <div className="flex gap-2">
-                                <Link href="#" className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
+                                <Link href="#" onClick={(e) => scrollToSection(e, "contact")} className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
                                     <Github className="h-5 w-5" />
                                 </Link>
-                                <Link href="#" className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
+                                <Link href="#" onClick={(e) => scrollToSection(e, "contact")} className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
                                     <Linkedin className="h-5 w-5" />
                                 </Link>
-                                <Link href="#" className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
+                                <Link href="#" onClick={(e) => scrollToSection(e, "contact")} className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}>
                                     <Mail className="h-5 w-5" />
                                 </Link>
                             </div>
